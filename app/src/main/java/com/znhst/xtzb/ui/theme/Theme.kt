@@ -1,6 +1,5 @@
-package com.bozhong.bz_intelligentcanteen.ui.theme
+package com.znhst.xtzb.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -12,15 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Primary80,
+    secondary = PrimaryGrey80,
+    tertiary = PrimaryLighter80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = Primary40,
+    secondary = PrimaryGrey40,
+    tertiary = PrimaryLighter40
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -34,7 +33,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun BZ_IntelligentCanteenTheme(
+fun ZB_CanteenTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,

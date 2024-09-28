@@ -1,4 +1,4 @@
-package com.bozhong.bz_intelligentcanteen
+package com.znhst.xtzb
 
 import org.junit.Test
 

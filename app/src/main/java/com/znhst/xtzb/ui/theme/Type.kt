@@ -1,4 +1,4 @@
-package com.bozhong.bz_intelligentcanteen.ui.theme
+package com.znhst.xtzb.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

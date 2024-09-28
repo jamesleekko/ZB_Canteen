@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "BZ_IntelligentCanteen"
+rootProject.name = "ZB_Canteen"
 include(":app")
