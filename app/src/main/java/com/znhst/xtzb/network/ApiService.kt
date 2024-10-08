@@ -11,9 +11,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import java.util.concurrent.TimeUnit
 
 data class LoginUser(
     @Json(name = "username") val username: String,
@@ -27,6 +30,17 @@ data class RegisterUser(
     @Json(name = "password") val password: String,
     @Json(name = "phone") val phone: String,
     @Json(name = "email") val email: String? = null,
+)
+
+data class EZTokenResponse(
+    @Json(name = "accessToken") val accessToken: String,
+    @Json(name = "expireTime") val expireTime: Long
+)
+
+data class EZTokenOuterResponse(
+    @Json(name = "data") val data: EZTokenResponse?,
+    @Json(name = "code") val code: String,
+    @Json(name = "msg") val msg: String
 )
 
 data class AuthResponse(@Json(name = "token") val token: String)
@@ -53,11 +67,20 @@ interface ApiService {
     @GET("/auth/code")
     @Headers("Content-Type: application/json")
     suspend fun getCaptcha(): CaptchaResponse
+
+    @POST("/api/lapp/token/get")
+    @FormUrlEncoded
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    suspend fun getEZToken(
+        @Field("appKey") appKey: String,
+        @Field("appSecret") appSecret: String
+    ): EZTokenOuterResponse
 }
 
 object ApiClient {
     private lateinit var tokenManager: TokenManager
     private lateinit var retrofit: Retrofit
+    private lateinit var ezRetrofit: Retrofit
 
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -65,12 +88,19 @@ object ApiClient {
         this.tokenManager = tokenManager
 
         val client = OkHttpClient.Builder()
+            .connectTimeout(5, TimeUnit.SECONDS)
             .addInterceptor(TokenInterceptor(tokenManager, context))
             .addInterceptor(ErrorInterceptor(context, logout))
             .build()
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000") // 替换成你的后端 URL
+            .baseUrl("http://10.0.2.2:8000")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(client)
+            .build()
+
+        ezRetrofit = Retrofit.Builder()
+            .baseUrl("https://open.ys7.com")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
@@ -78,5 +108,8 @@ object ApiClient {
 
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
+    }
+    val ezApiService: ApiService by lazy {
+        ezRetrofit.create(ApiService::class.java)
     }
 }

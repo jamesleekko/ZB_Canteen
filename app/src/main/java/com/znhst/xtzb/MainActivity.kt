@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.znhst.xtzb.ui.page.AuthScreen
 import com.znhst.xtzb.ui.theme.ZB_CanteenTheme
@@ -17,12 +18,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.videogo.openapi.EZOpenSDK
 import com.znhst.xtzb.network.ApiClient
+import com.znhst.xtzb.network.ApiService
 import com.znhst.xtzb.ui.page.MainPage
 import com.znhst.xtzb.ui.page.RegisterScreen
 import com.znhst.xtzb.utils.TokenManager
 import com.znhst.xtzb.viewModel.AuthViewModel
+import com.znhst.xtzb.viewModel.EZViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -34,7 +38,10 @@ class MainActivity : ComponentActivity() {
         val tokenManager = TokenManager(this)
 
         val appKey = "1c66441dc45f4e939689a2ba4b901bcd"
-        val defaultToken = "at.1lszaid9bojnn1xk4h8k7mw014w9q6cv-6f0nozgfch-1ug0drv-4cnlkih65"
+        val secretKey = "146aa934f75321813042020a9237ee86"
+        val defaultToken = "at.5nt9mkjh6d5npqbs45edjb1c9yk8v0dr-4n7pavg512-1knkq5q-ikt3kspgx"
+
+        val ezViewModel = EZViewModel(application)
 
         setContent {
             ZB_CanteenTheme {
@@ -43,6 +50,8 @@ class MainActivity : ComponentActivity() {
         }
 
         CoroutineScope(Dispatchers.Main).launch {
+            ezViewModel.getEZToken(appKey, secretKey)
+
             // 开启 SDK 日志（正式发布时去掉）
             EZOpenSDK.showSDKLog(true)
             // 设置是否支持P2P取流
@@ -50,7 +59,12 @@ class MainActivity : ComponentActivity() {
             // 初始化 SDK，替换成你申请的 APP_KEY
             EZOpenSDK.initLib(application, appKey)
             val instance = EZOpenSDK.getInstance()
-            instance.setAccessToken((defaultToken))
+            ezViewModel.accessToken.value.let {
+                if (it != "") {
+                    Log.d("设置token", it)
+                    instance.setAccessToken((it))
+                }
+            }
 
 //            try {
 //                val deviceList = withContext(Dispatchers.IO) {

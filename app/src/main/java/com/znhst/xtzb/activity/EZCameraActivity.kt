@@ -2,7 +2,6 @@ package com.znhst.xtzb.activity
 
 import android.content.pm.ActivityInfo
 import android.os.Bundle
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.activity.ComponentActivity
@@ -20,24 +19,27 @@ class EZCameraActivity: ComponentActivity() {
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
 
+        val cameraSerial = intent.getStringExtra("cameraSerial")
+        val cameraNo = intent.getIntExtra("cameraNo", 1)
+
         setContent {
-            CameraScreen()
+            if (cameraSerial != null) {
+                CameraScreen(cameraSerial, cameraNo)
+            } else {
+                finish()
+            }
         }
     }
 }
 
 @Composable
-fun CameraScreen() {
+fun CameraScreen(cameraSerial: String, cameraNo: Int) {
     var player: EZPlayer? = null
 
     fun startCameraPreview(holder: SurfaceHolder) {
-        // 替换成你的设备序列号
-        val cameraSerial = "BC5617792"
-        val cameraNo= 1
-
-        player = EZOpenSDK.getInstance().createPlayer(cameraSerial, cameraNo)
-        player?.setSurfaceHold(holder)
-        player?.startRealPlay() // 开始播放
+            player = EZOpenSDK.getInstance().createPlayer(cameraSerial, cameraNo)
+            player?.setSurfaceHold(holder)
+            player?.startRealPlay() // 开始播放
     }
 
     fun stopCameraPreview() {
