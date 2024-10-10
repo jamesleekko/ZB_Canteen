@@ -72,6 +72,7 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
                 ApiClient.apiService.logout()
                 tokenManager.clearToken()
                 onSuccess()
+                Log.d("注销成功","123")
             } catch (e: HttpException) {
                 Log.d("注销失败",e.message())
             }

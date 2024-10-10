@@ -88,13 +88,13 @@ object ApiClient {
         this.tokenManager = tokenManager
 
         val client = OkHttpClient.Builder()
-            .connectTimeout(5, TimeUnit.SECONDS)
             .addInterceptor(TokenInterceptor(tokenManager, context))
             .addInterceptor(ErrorInterceptor(context, logout))
             .build()
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000")
+//            .baseUrl("http://10.0.2.2:8000")
+            .baseUrl("http://192.168.1.6:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()

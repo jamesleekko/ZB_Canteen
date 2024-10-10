@@ -124,18 +124,10 @@ fun MainPage(viewModel: AuthViewModel = viewModel(), navController: NavControlle
 
         Column(Modifier.padding(innerPadding)) {
             NavHost(navController = navController, startDestination = MainScreenRoute.News.route) {
-                composable(MainScreenRoute.News.route) { Text(MainScreenRoute.News.title) }
+                composable(MainScreenRoute.News.route) { News() }
                 composable(MainScreenRoute.Devices.route) { DeviceList() }
                 composable(MainScreenRoute.Profile.route) { Profile(viewModel) }
             }
-        }
-    }
-}
-
-fun logout(viewModel: AuthViewModel, navController: NavController) {
-    viewModel.logout {
-        navController.navigate("login") {
-            popUpTo("main") { inclusive = true }
         }
     }
 }

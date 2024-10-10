@@ -7,11 +7,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.znhst.xtzb.viewModel.AuthViewModel
 
 @Composable
-fun Profile(viewModel: AuthViewModel) {
+fun Profile(viewModel: AuthViewModel = viewModel()) {
     val navController = rememberNavController()
 
     Column(modifier = Modifier.padding(16.dp)) {
@@ -19,6 +21,14 @@ fun Profile(viewModel: AuthViewModel) {
             logout(viewModel, navController)
         }) {
             Text("注销")
+        }
+    }
+}
+
+fun logout(viewModel: AuthViewModel, navController: NavController) {
+    viewModel.logout {
+        navController.navigate("login") {
+            popUpTo("main") { inclusive = true }
         }
     }
 }

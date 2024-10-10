@@ -2,6 +2,7 @@ package com.znhst.xtzb.ui.page
 
 import android.content.Context
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -49,7 +50,11 @@ fun AuthScreen(
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        viewModel.getCaptcha()
+        try{
+            viewModel.getCaptcha()
+        } catch(e: Exception) {
+            Toast.makeText(context, "获取验证码失败！${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     Box(
@@ -136,13 +141,6 @@ fun AuthScreen(
                 .padding(commonPadding)
                 .align(Alignment.BottomCenter),
         ) {
-            Button(onClick = {
-                val intent = Intent(context, EZCameraActivity::class.java)
-                startActivity(context, intent, null)
-            }) {
-                Text("测试摄像头")
-            }
-
             Button(
                 onClick = {
                     navController.navigate("register")

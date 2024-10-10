@@ -59,14 +59,19 @@ fun RegisterScreen(viewModel: AuthViewModel = viewModel(), navController: NavCon
 
         scope.launch {
             isLoading = true
-            viewModel.register(username, password, phone).onSuccess {
+            try{
+                viewModel.register(username, password, phone).onSuccess {
+                    isLoading = false
+                    Toast.makeText(context, "注册成功！", Toast.LENGTH_SHORT).show()
+                    delay(2000)
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }.onFailure { isLoading = false }
+            } catch (e: Exception) {
                 isLoading = false
-                Toast.makeText(context, "注册成功！", Toast.LENGTH_SHORT).show()
-                delay(2000)
-                navController.navigate("login") {
-                    popUpTo("register") { inclusive = true }
-                }
-            }.onFailure { isLoading = false }
+                Toast.makeText(context, "注册失败！${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
