@@ -93,8 +93,8 @@ object ApiClient {
             .build()
 
         retrofit = Retrofit.Builder()
-//            .baseUrl("http://10.0.2.2:8000")
-            .baseUrl("http://192.168.1.6:8000")
+            .baseUrl("http://10.0.2.2:8000")
+//            .baseUrl("http://192.168.1.12:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
