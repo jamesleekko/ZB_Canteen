@@ -56,7 +56,7 @@ class MainActivity : ComponentActivity() {
                 val instance = EZOpenSDK.getInstance()
                 ezViewModel.accessToken.value.let {
                     if (it != "") {
-                        Log.d("设置token", it)
+                        Log.d("设置token", it.toString())
                         instance.setAccessToken((it))
                     }
                 }

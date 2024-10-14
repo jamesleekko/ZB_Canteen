@@ -14,8 +14,10 @@ import retrofit2.http.DELETE
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Query
 import java.util.concurrent.TimeUnit
 
 data class LoginUser(
@@ -30,6 +32,12 @@ data class RegisterUser(
     @Json(name = "password") val password: String,
     @Json(name = "phone") val phone: String,
     @Json(name = "email") val email: String? = null,
+)
+
+data class AACStatusParams(
+    @Json(name = "accessToken") val accessToken: String,
+    @Json(name = "deviceSerial") val deviceSerial: String,
+    @Json(name = "localIndex") val localIndex: String?,
 )
 
 data class EZTokenResponse(
@@ -48,6 +56,25 @@ data class AuthResponse(@Json(name = "token") val token: String)
 data class CaptchaResponse(
     @Json(name = "img") val img: String,
     @Json(name = "uuid") val uuid: String
+)
+
+data class AACTransferStatusData(
+    @Json(name = "enable") val enable: Boolean
+)
+
+data class AACTransferStatusMeta(
+    @Json(name = "code") val code: Int,
+    @Json(name = "message") val message: String,
+    @Json(name = "moreInfo") val moreInfo: Any?
+)
+
+data class AACTransferStatusResponse(
+    @Json(name = "data") val data: AACTransferStatusData,
+    @Json(name = "meta") val meta: AACTransferStatusMeta,
+)
+
+data class AACSettingStatusResponse(
+    @Json(name = "meta") val meta: AACTransferStatusMeta,
 )
 
 interface ApiService {
@@ -75,6 +102,23 @@ interface ApiService {
         @Field("appKey") appKey: String,
         @Field("appSecret") appSecret: String
     ): EZTokenOuterResponse
+
+    @GET("/api/service/media/aac/transfer")
+    @Headers("Content-Type: application/json")
+    suspend fun getAACTransferStatus(
+        @Header("accessToken") accessToken: String,
+        @Header("deviceSerial") deviceSerial: String,
+        @Header("localIndex") localIndex: String?
+    ): AACTransferStatusResponse
+
+    @POST("/api/service/media/aac/transfer")
+    @Headers("Content-Type: application/json")
+    suspend fun setAACTransferStatus(
+        @Header("accessToken") accessToken: String,
+        @Header("deviceSerial") deviceSerial: String,
+        @Header("localIndex") localIndex: String?,
+        @Query("enable") enable: Int
+    ): AACSettingStatusResponse
 }
 
 object ApiClient {
@@ -93,8 +137,8 @@ object ApiClient {
             .build()
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000")
-//            .baseUrl("http://192.168.1.12:8000")
+//            .baseUrl("http://10.0.2.2:8000")
+            .baseUrl("http://192.168.1.12:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()

@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.videotalk)
     implementation(libs.streamctrl)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
