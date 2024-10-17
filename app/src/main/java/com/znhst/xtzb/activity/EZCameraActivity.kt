@@ -1,10 +1,9 @@
 package com.znhst.xtzb.activity
 
 import android.Manifest
+import android.app.Activity
 import android.app.Application
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.media.MediaScannerConnection
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -14,9 +13,15 @@ import android.view.SurfaceView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -24,30 +29,36 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
 import com.videogo.openapi.EZConstants
 import com.videogo.openapi.EZOpenSDK
 import com.videogo.openapi.EZPlayer
+import com.videogo.util.LocalInfo
 import com.znhst.xtzb.compose.CircularRemoteControl
+import com.znhst.xtzb.utils.addVideoToGalleryFromPrivateDir
+import com.znhst.xtzb.utils.saveBitmapToMediaStore
+import com.znhst.xtzb.utils.saveBitmapToPublicDir
 import com.znhst.xtzb.viewModel.EZViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
 
 class EZCameraActivity : ComponentActivity() {
     private fun requestAudioPermission() {
         if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(arrayOf(Manifest.permission.RECORD_AUDIO,Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
+            requestPermissions(
+                arrayOf(
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ), 100
+            )
         }
-
-//        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 100)
-//        }
     }
 
     override fun onRequestPermissionsResult(
@@ -71,7 +82,7 @@ class EZCameraActivity : ComponentActivity() {
 
         setContent {
             if (cameraSerial != null) {
-                CameraScreen(cameraSerial, cameraNo, application)
+                CameraScreen(cameraSerial, cameraNo, application, this)
             } else {
                 finish()
             }
@@ -80,8 +91,19 @@ class EZCameraActivity : ComponentActivity() {
 }
 
 @Composable
-fun CameraScreen(cameraSerial: String, cameraNo: Int, application: Application) {
-    var player: EZPlayer? = null
+fun CameraScreen(
+    cameraSerial: String,
+    cameraNo: Int,
+    application: Application,
+    activity: Activity
+) {
+    var player by remember { mutableStateOf<EZPlayer?>(null) }
+    val localInfo: LocalInfo = LocalInfo.getInstance()
+
+    var isSoundOpen by remember { mutableStateOf(localInfo.isSoundOpen) }
+    var isTalking by remember { mutableStateOf(false) }
+    var isRecording by remember { mutableStateOf(false) }
+    var currentVideoName by remember { mutableStateOf<String?>(null) }
 
     val top: EZConstants.EZPTZCommand = EZConstants.EZPTZCommand.EZPTZCommandUp
     val down: EZConstants.EZPTZCommand = EZConstants.EZPTZCommand.EZPTZCommandDown
@@ -96,6 +118,10 @@ fun CameraScreen(cameraSerial: String, cameraNo: Int, application: Application) 
 
     val ezViewModel = EZViewModel(application)
     val token by ezViewModel.accessToken.observeAsState("")
+
+    LaunchedEffect(Unit) {
+        isSoundOpen = localInfo.isSoundOpen
+    }
 
     fun startCameraMovement(direction: EZConstants.EZPTZCommand) {
         Log.d("摄像头移动", "move")
@@ -128,34 +154,58 @@ fun CameraScreen(cameraSerial: String, cameraNo: Int, application: Application) 
             player?.openSound()
 //            delay(2000)
 //            player?.startVoiceTalk()
+//            delay(2000)
+//            player?.setVoiceTalkStatus(true)
 //            delay(4000)
 //            player?.stopVoiceTalk()
         }
     }
 
     fun stopCameraPreview() {
+        player?.stopVoiceTalk()
         // 停止播放并释放播放器资源
         EZOpenSDK.getInstance().releasePlayer(player)
     }
 
-    fun addImageToGallery(filePath: String) {
-        MediaScannerConnection.scanFile(context, arrayOf(filePath), null, null)
+    fun toggleSound() {
+        if (isSoundOpen) {
+            player?.closeSound()
+        } else {
+            player?.openSound()
+        }
     }
 
-    fun saveBitmap(bitmap: Bitmap) {
-        Log.d("SaveBitmap", bitmap.toString())
-        val filename = "众搏摄像头截图_${cameraSerial}_${System.currentTimeMillis()}.png"
-        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), filename)
+    fun onClickTalk() {
 
-        try {
-            FileOutputStream(file).use { out ->
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+    }
+
+    fun onClickRecord() {
+        if (isRecording) {
+            if (player?.stopLocalRecord() == true) {
+                scope.launch {
+                    isRecording = false
+                    if (currentVideoName != null) {
+                        delay(2000)
+                        addVideoToGalleryFromPrivateDir(context, File(currentVideoName).name)
+                    }
+                }
             }
-            addImageToGallery(file.absolutePath)
-            Log.d("SaveBitmap", "Image saved: ${file.absolutePath}")
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Log.e("SaveBitmap", "Error saving image: ${e.message}")
+
+            Log.d("ez record", "stop")
+            return
+        }
+
+        currentVideoName =
+            "${context.filesDir}/records/ZB_Camera_${cameraSerial}_${System.currentTimeMillis()}.mp4"
+        Log.d("ez record", currentVideoName!!)
+        if (player == null) {
+            Log.d("ez record no player", currentVideoName!!)
+            return
+        }
+        if (player!!.startLocalRecordWithFile(currentVideoName!!)) {
+            isRecording = true
+        } else {
+            Toast.makeText(context, "启动录制失败", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -184,6 +234,7 @@ fun CameraScreen(cameraSerial: String, cameraNo: Int, application: Application) 
                         }
 
                         override fun surfaceDestroyed(holder: SurfaceHolder) {
+                            Log.d("surface destroyed", "123")
                             // 销毁时释放资源
                             stopCameraPreview()
                         }
@@ -213,21 +264,93 @@ fun CameraScreen(cameraSerial: String, cameraNo: Int, application: Application) 
             onRightUp = { stopCameraMovement(right) }
         )
 
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(100.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-            Button(onClick = {
-
-            }) {
-                Text("录屏")
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+//            Button(
+//                onClick = {
+//                    toggleSound()
+//                },
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = if (isSoundOpen) Color.Green else Color.Red // 声音开：绿色，声音关：红色
+//                ),
+//            ) {
+//                Text("声音")
+//            }
+            Button(
+                onClick = {
+                    onClickRecord()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isRecording) Color.Red else Color.LightGray,
+                    contentColor = if (isRecording) Color.White else Color.White
+                ),
+                shape = CircleShape,
+                modifier = Modifier.size(90.dp),
+                border = BorderStroke(4.dp, if (isRecording) Color.Red else Color.Green)
+            ) {
+                Text(
+                    text = if (isRecording) "录屏中" else "录屏",
+//                    maxLines = 1,
+//                    overflow = TextOverflow.Visible
+                )
             }
-            Button(onClick = {
-                player?.capturePicture().let {
-                    if (it != null) {
-                        saveBitmap(it)
+            Button(
+                onClick = {
+                    onClickTalk()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isTalking) Color.Blue else Color.LightGray,
+                    contentColor = if (isTalking) Color.White else Color.White
+                ),
+                shape = CircleShape,
+                modifier = Modifier.size(90.dp),
+                border = BorderStroke(4.dp, if (isTalking) Color.Blue else Color.Blue)
+            ) {
+                Text(text = if (isTalking) "对讲中" else "对讲", maxLines = 1)
+            }
+            Button(
+                onClick = {
+                    player?.capturePicture().let {
+                        if (it != null) {
+                            val fileName =
+                                "ZB_Camera_${cameraSerial}_${System.currentTimeMillis()}.png"
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                                // Android 10+ 使用 MediaStore 保存图片
+//                            saveBitmapToMediaStore(context, it, fileName)
+                                saveBitmapToMediaStore(context, it, fileName)
+                            } else {
+                                // Android 9 及以下 需要申请存储权限并保存到外部存储
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                                    )
+                                    == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    saveBitmapToPublicDir(context, it, fileName)
+                                } else {
+                                    ActivityCompat.requestPermissions(
+                                        activity,
+                                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                                        REQUEST_CODE
+                                    )
+                                }
+                            }
+                        }
                     }
-                }
-            }) {
+                }, colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.LightGray,
+                    contentColor = Color.White
+                ),
+                shape = CircleShape,
+                modifier = Modifier.size(90.dp),
+                border = BorderStroke(4.dp, MaterialTheme.colorScheme.primary)
+            ) {
                 Text("截图")
             }
         }
