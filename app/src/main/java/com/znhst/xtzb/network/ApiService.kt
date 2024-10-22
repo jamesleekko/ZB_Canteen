@@ -5,6 +5,8 @@ import com.znhst.xtzb.utils.TokenManager
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.znhst.xtzb.dataModel.ZBDeviceCategory
+import com.znhst.xtzb.dataModel.ZBDeviceInfo
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -119,6 +121,14 @@ interface ApiService {
         @Header("localIndex") localIndex: String?,
         @Query("enable") enable: Int
     ): AACSettingStatusResponse
+
+    @GET("/zb/device_category_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getDeviceCategories(): List<ZBDeviceCategory>
+
+    @GET("/zb/camera_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getCameras(): List<ZBDeviceInfo>
 }
 
 object ApiClient {
@@ -137,8 +147,8 @@ object ApiClient {
             .build()
 
         retrofit = Retrofit.Builder()
-//            .baseUrl("http://10.0.2.2:8000")
-            .baseUrl("http://192.168.1.12:8000")
+            .baseUrl("http://10.0.2.2:8000")
+//            .baseUrl("http://192.168.1.6:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()

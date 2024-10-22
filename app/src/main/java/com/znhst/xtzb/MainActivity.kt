@@ -16,6 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.videogo.openapi.EZOpenSDK
 import com.znhst.xtzb.network.ApiClient
+import com.znhst.xtzb.ui.page.CameraList
 import com.znhst.xtzb.ui.page.MainPage
 import com.znhst.xtzb.ui.page.RegisterScreen
 import com.znhst.xtzb.utils.TokenManager
