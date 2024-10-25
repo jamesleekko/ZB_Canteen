@@ -1,0 +1,59 @@
+package com.znhst.xtzb.viewModel
+
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.znhst.xtzb.network.ApiClient
+import com.znhst.xtzb.network.FreezerEntry
+import com.znhst.xtzb.utils.TokenManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+
+class FreezerDetailViewModel(application: Application) : AndroidViewModel(application) {
+    var tokenManager = TokenManager(getApplication<Application>().applicationContext)
+
+    private val _historyList = MutableStateFlow<List<FreezerEntry>>(emptyList())
+    val historyList: StateFlow<List<FreezerEntry>> = _historyList
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
+
+    fun fetchHistory(deviceNo: String) {
+        viewModelScope.launch {
+            try {
+                // 获取当前时间
+                val now = LocalDateTime.now()
+
+                // 计算一周前的时间
+                val oneMonthAgo = now.minus(1, ChronoUnit.MONTHS)
+
+                // 定义时间格式化模式
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+
+                // 格式化开始时间和结束时间
+                val formattedStart = oneMonthAgo.format(formatter)
+                val formattedEnd = now.format(formatter)
+                val dayufengToken = ApiClient.apiService.getDayufengToken()
+                val result = ApiClient.dayufengApiService.getFreezerHistory(
+                    "Bearer $dayufengToken",
+                    "2",
+                    deviceNo,
+                    "1",
+                    "30",
+                    formattedStart,
+                    formattedEnd
+                )
+                Log.d("拉取到冰箱历史记录列表:", result.toString())
+//                _historyList.value = result
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching freezer history: ${e.message}"
+            }
+        }
+    }
+}

@@ -13,12 +13,12 @@ import androidx.navigation.compose.rememberNavController
 import com.znhst.xtzb.viewModel.AuthViewModel
 
 @Composable
-fun Profile(viewModel: AuthViewModel = viewModel()) {
-    val navController = rememberNavController()
+fun Profile(viewModel: AuthViewModel = viewModel(), outNavController: NavController) {
+//    val navController = rememberNavController()
 
     Column(modifier = Modifier.padding(16.dp)) {
         Button(onClick = {
-            logout(viewModel, navController)
+            logout(viewModel, outNavController)
         }) {
             Text("注销")
         }

@@ -5,8 +5,10 @@ import com.znhst.xtzb.utils.TokenManager
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import com.znhst.xtzb.dataModel.ZBDeviceCategory
-import com.znhst.xtzb.dataModel.ZBDeviceInfo
+import com.znhst.xtzb.dataModel.EZDeviceCategory
+import com.znhst.xtzb.dataModel.EZDeviceInfo
+import com.znhst.xtzb.dataModel.FreezerInfo
+import com.znhst.xtzb.dataModel.SmokeAlarmInfo
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -20,7 +22,6 @@ import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
-import java.util.concurrent.TimeUnit
 
 data class LoginUser(
     @Json(name = "username") val username: String,
@@ -79,6 +80,39 @@ data class AACSettingStatusResponse(
     @Json(name = "meta") val meta: AACTransferStatusMeta,
 )
 
+data class DayufentResponse<T>(
+    @Json(name = "data") val data: T?,
+    @Json(name = "code") val code: Int,
+    @Json(name = "msg") val msg: String
+)
+
+data class FreezerHistoryData(
+    @Json(name = "th") val th: List<ThProperty>,
+    @Json(name = "data") val data: List<FreezerEntry>
+)
+
+data class ThProperty(
+    @Json(name = "prop") val prop: String,
+    @Json(name = "label") val label: String,
+    @Json(name = "beishu") val beishu: Int,
+    @Json(name = "t") val t: Int,
+    @Json(name = "n") val n: Int,
+    @Json(name = "danwei") val danwei: String
+)
+
+data class FreezerEntry(
+    @Json(name = "shebeibianhao") val deviceNo: String,
+    @Json(name = "time") val time: String,
+    @Json(name = "open1") val doorStatus: String,
+    @Json(name = "xinhao") val signalStrength: String,
+    @Json(name = "address") val address: String,
+    @Json(name = "power") val power: String,
+    @Json(name = "jingdu") val longitude: String,
+    @Json(name = "weidu") val latitude: String,
+    @Json(name = "coordinate_type") val coordinateType: Int,
+    @Json(name = "id") val id: Int
+)
+
 interface ApiService {
 
     @POST("/api/users/register")
@@ -124,17 +158,42 @@ interface ApiService {
 
     @GET("/zb/device_category_list")
     @Headers("Content-Type: application/json")
-    suspend fun getDeviceCategories(): List<ZBDeviceCategory>
+    suspend fun getDeviceCategories(): List<EZDeviceCategory>
 
     @GET("/zb/camera_list")
     @Headers("Content-Type: application/json")
-    suspend fun getCameras(): List<ZBDeviceInfo>
+    suspend fun getCameras(): List<EZDeviceInfo>
+
+    @GET("/dayufeng/token")
+    @Headers("Content-Type: application/json")
+    suspend fun getDayufengToken(): String
+
+    @GET("/dayufeng/freezer_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getDayufengFreezers(): List<FreezerInfo>
+
+    @GET("/dayufeng/smoke_alarm_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getDayufengSmokeAlarms(): List<SmokeAlarmInfo>
+
+    @GET("/devices_data_v2")
+    @Headers("Content-Type: application/json")
+    suspend fun getFreezerHistory(
+        @Header("Authorization") token: String,
+        @Query("login_type") loginType: String,
+        @Query("shebeibianhao") deviceNo: String,
+        @Query("page") page: String,
+        @Query("limit") limit: String,
+        @Query("startTime", encoded = true) startTime: String,
+        @Query("endTime", encoded = true) endTime: String
+    ): DayufentResponse<FreezerHistoryData>
 }
 
 object ApiClient {
     private lateinit var tokenManager: TokenManager
     private lateinit var retrofit: Retrofit
     private lateinit var ezRetrofit: Retrofit
+    private lateinit var dayufengRetrofit: Retrofit
 
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -143,6 +202,10 @@ object ApiClient {
 
         val client = OkHttpClient.Builder()
             .addInterceptor(TokenInterceptor(tokenManager, context))
+            .addInterceptor(ErrorInterceptor(context, logout))
+            .build()
+
+        val dayufengClient = OkHttpClient.Builder()
             .addInterceptor(ErrorInterceptor(context, logout))
             .build()
 
@@ -158,6 +221,12 @@ object ApiClient {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
+
+        dayufengRetrofit = Retrofit.Builder()
+            .baseUrl("https://api.dayufeng.cn")
+            .addConverterFactory(MoshiConverterFactory.create(moshi))
+            .client(dayufengClient)
+            .build()
     }
 
     val apiService: ApiService by lazy {
@@ -165,5 +234,9 @@ object ApiClient {
     }
     val ezApiService: ApiService by lazy {
         ezRetrofit.create(ApiService::class.java)
+    }
+
+    val dayufengApiService: ApiService by lazy {
+        dayufengRetrofit.create(ApiService::class.java)
     }
 }

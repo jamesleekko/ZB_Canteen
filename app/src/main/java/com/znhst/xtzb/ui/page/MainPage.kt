@@ -27,9 +27,11 @@ import com.znhst.xtzb.R
 import com.znhst.xtzb.viewModel.AuthViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.znhst.xtzb.activity.CodeScanActivity
 import com.znhst.xtzb.viewModel.DeviceViewModel
 
@@ -51,9 +53,13 @@ val routes = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPage(viewModel: AuthViewModel = viewModel(),deviceViewModel: DeviceViewModel = viewModel(), navController: NavController) {
+fun MainPage(
+    viewModel: AuthViewModel = viewModel(),
+    deviceViewModel: DeviceViewModel = viewModel(),
+    outNavController: NavController
+) {
     val context = LocalContext.current
-    val navController = rememberNavController()
+    val mainPageNavController = rememberNavController()
     var selectedItem by remember { mutableIntStateOf(0) }
 
     Scaffold(
@@ -88,7 +94,7 @@ fun MainPage(viewModel: AuthViewModel = viewModel(),deviceViewModel: DeviceViewM
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
-                            navController.navigate(screen.route)
+                            mainPageNavController.navigate(screen.route)
                         }
                     )
                 }
@@ -98,11 +104,43 @@ fun MainPage(viewModel: AuthViewModel = viewModel(),deviceViewModel: DeviceViewM
         println(innerPadding)
 
         Column(Modifier.padding(innerPadding)) {
-            NavHost(navController = navController, startDestination = MainScreenRoute.News.route) {
+            NavHost(
+                navController = mainPageNavController,
+                startDestination = MainScreenRoute.News.route
+            ) {
                 composable(MainScreenRoute.News.route) { News() }
-                composable(MainScreenRoute.Devices.route) { DeviceCategory(deviceViewModel, navController = navController) }
-                composable(MainScreenRoute.Profile.route) { Profile(viewModel) }
+                composable(MainScreenRoute.Devices.route) {
+                    DeviceCategory(
+                        deviceViewModel,
+                        navController = mainPageNavController
+                    )
+                }
+                composable(MainScreenRoute.Profile.route) { Profile(viewModel, outNavController) }
                 composable("camera_list") { CameraList() }
+                composable(
+                    "freezer_list"
+                ) {
+                    FreezerList(navController = mainPageNavController)
+                }
+                composable(
+                    "smoke_alarm_list"
+                ) {
+                    SmokeAlarmList(navController = mainPageNavController)
+                }
+                composable(
+                    route = "freezer_detail/{deviceNo}",
+                    arguments = listOf(navArgument("deviceNo") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val deviceNo = backStackEntry.arguments?.getString("deviceNo")
+                    FreezerDetail(deviceNo = deviceNo!!)
+                }
+                composable(
+                    route = "smoke_alarm_detail/{deviceNo}",
+                    arguments = listOf(navArgument("deviceNo") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val deviceNo = backStackEntry.arguments?.getString("deviceNo")
+                    SmokeAlarmDetail(deviceNo = deviceNo!!)
+                }
             }
         }
     }

@@ -88,6 +88,6 @@ fun MyMain(context: Context, tokenManager: TokenManager, viewModel: AuthViewMode
     NavHost(navController = navController, startDestination = if (hasToken) "main" else "login") {
         composable("login") { AuthScreen(context, viewModel(), navController = navController) }
         composable("register") { RegisterScreen(viewModel(), navController = navController) }
-        composable("main") { MainPage(navController = navController) }
+        composable("main") { MainPage(outNavController = navController) }
     }
 }

@@ -15,7 +15,7 @@ class EZViewModel(application: Application) : AndroidViewModel(application) {
     var expireTime :LiveData<Long> = GlobalData.ezExpireTime
 
     suspend fun getEZToken(appKey: String, appSecret: String): Result<String> {
-        Log.d("accesstoken res123", "$appKey $appSecret")
+        Log.d("accesstoken res", "$appKey $appSecret")
         return try {
             val response = ApiClient.ezApiService.getEZToken(appKey, appSecret)
             response.data?.let { Log.d("accesstoken res123456", it.accessToken) }
