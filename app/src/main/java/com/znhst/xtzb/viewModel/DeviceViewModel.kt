@@ -59,7 +59,6 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchFreezers() {
         viewModelScope.launch {
             try {
-//               val dayufengToken = ApiClient.apiService.getDayufengToken()
                 val result = ApiClient.apiService.getDayufengFreezers()
                 Log.d("拉取到冰箱列表:", result.toString())
                 _freezerList.value = result
@@ -72,7 +71,6 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchSmokeAlarms() {
         viewModelScope.launch {
             try {
-//                val dayufengToken = ApiClient.apiService.getDayufengToken()
                 val result = ApiClient.apiService.getDayufengSmokeAlarms()
                 Log.d("拉取到烟雾报警器列表:", result.toString())
                 _smokeAlarmList.value = result
@@ -85,7 +83,6 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
     fun fetchFreezerHistory(deviceNo: String) {
         viewModelScope.launch {
             try {
-               val dayufengToken = ApiClient.apiService.getDayufengToken()
                 val result = ApiClient.apiService.getDayufengFreezers()
                 Log.d("拉取到冰箱列表:", result.toString())
                 _freezerList.value = result

@@ -80,15 +80,19 @@ data class AACSettingStatusResponse(
     @Json(name = "meta") val meta: AACTransferStatusMeta,
 )
 
-data class DayufentResponse<T>(
+data class DayufengResponse<T>(
     @Json(name = "data") val data: T?,
     @Json(name = "code") val code: Int,
     @Json(name = "msg") val msg: String
 )
 
-data class FreezerHistoryData(
+data class DayufengData<T>(
+    @Json(name = "data") val data: T
+)
+
+data class DayufengHistoryData<T>(
     @Json(name = "th") val th: List<ThProperty>,
-    @Json(name = "data") val data: List<FreezerEntry>
+    @Json(name = "data") val data: List<T>
 )
 
 data class ThProperty(
@@ -101,6 +105,19 @@ data class ThProperty(
 )
 
 data class FreezerEntry(
+    @Json(name = "shebeibianhao") val deviceNo: String,
+    @Json(name = "time") val time: String,
+    @Json(name = "open1") val doorStatus: String,
+    @Json(name = "xinhao") val signalStrength: String,
+    @Json(name = "address") val address: String,
+    @Json(name = "power") val power: String,
+    @Json(name = "jingdu") val longitude: String,
+    @Json(name = "weidu") val latitude: String,
+    @Json(name = "coordinate_type") val coordinateType: Int,
+    @Json(name = "id") val id: Int
+)
+
+data class SmokeAlarmEntry(
     @Json(name = "shebeibianhao") val deviceNo: String,
     @Json(name = "time") val time: String,
     @Json(name = "open1") val doorStatus: String,
@@ -186,7 +203,19 @@ interface ApiService {
         @Query("limit") limit: String,
         @Query("startTime", encoded = true) startTime: String,
         @Query("endTime", encoded = true) endTime: String
-    ): DayufentResponse<FreezerHistoryData>
+    ): DayufengResponse<DayufengData<DayufengHistoryData<FreezerEntry>>>
+
+    @GET("/devices_data_v2")
+    @Headers("Content-Type: application/json")
+    suspend fun getSmokeAlarmHistory(
+        @Header("Authorization") token: String,
+        @Query("login_type") loginType: String,
+        @Query("shebeibianhao") deviceNo: String,
+        @Query("page") page: String,
+        @Query("limit") limit: String,
+        @Query("startTime", encoded = true) startTime: String,
+        @Query("endTime", encoded = true) endTime: String
+    ): DayufengResponse<DayufengData<DayufengHistoryData<SmokeAlarmEntry>>>
 }
 
 object ApiClient {

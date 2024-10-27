@@ -14,8 +14,9 @@ import java.io.IOException
 
 data class ApiErrorBody(
     @Json(name = "status") var status: Int,
-    @Json(name = "message") var message: String,
-    @Json(name = "timestamp") var timestamp: Long
+    @Json(name = "message") var message: String?,
+    //timestamp为Long或者String
+    @Json(name = "timestamp") var timestamp: Any?,
 )
 
 class ErrorInterceptor(private val context: Context,private val logout:() -> Unit) : Interceptor {
@@ -43,14 +44,14 @@ class ErrorInterceptor(private val context: Context,private val logout:() -> Uni
 
             errorResponse?.let {
                 Log.d("response error", "Code: ${it.status}, Message: ${it.message}")
-                showApiErrorToast(context, it.message)
+                showApiErrorToast(context, it.message?: "未知错误")
 
                 // 处理 401 错误
                 if (it.status == 401) {
                     logout()
                 }
 
-                throw ApiException(it.status, it.message)
+                throw ApiException(it.status, it.message?: "未知错误")
             }
         }
 

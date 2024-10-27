@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.znhst.xtzb.network.ApiClient
-import com.znhst.xtzb.network.FreezerEntry
+import com.znhst.xtzb.network.SmokeAlarmEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,10 +13,10 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-class FreezerDetailViewModel(application: Application) : AndroidViewModel(application) {
+class SmokeAlarmViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _historyList = MutableStateFlow<List<FreezerEntry>>(emptyList())
-    val historyList: StateFlow<List<FreezerEntry>> = _historyList
+    private val _historyList = MutableStateFlow<List<SmokeAlarmEntry>>(emptyList())
+    val historyList: StateFlow<List<SmokeAlarmEntry>> = _historyList
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -37,7 +37,7 @@ class FreezerDetailViewModel(application: Application) : AndroidViewModel(applic
                 val formattedStart = oneMonthAgo.format(formatter)
                 val formattedEnd = now.format(formatter)
                 val dayufengToken = ApiClient.apiService.getDayufengToken()
-                val result = ApiClient.dayufengApiService.getFreezerHistory(
+                val result = ApiClient.dayufengApiService.getSmokeAlarmHistory(
                     "Bearer $dayufengToken",
                     "2",
                     deviceNo,

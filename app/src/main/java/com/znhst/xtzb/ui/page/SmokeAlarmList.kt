@@ -38,7 +38,7 @@ fun SmokeAlarmList(deviceViewModel: DeviceViewModel = viewModel(), navController
         items(deviceList) { device ->
             Card(modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    navController.navigate("freezer_detail")
+                    navController.navigate("freezer_detail/${device.deviceNo}")
                 }) {
                 Column(modifier = Modifier.padding(8.dp)) {
                     Text(text = "设备名称: ${device.deviceAlias}")
