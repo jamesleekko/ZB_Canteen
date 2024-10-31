@@ -1,15 +1,18 @@
 package com.znhst.xtzb.ui.page
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,15 +26,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.videogo.openapi.bean.EZDeviceInfo
+import com.znhst.xtzb.R
 import com.znhst.xtzb.dataModel.EZDeviceCategory
-import com.znhst.xtzb.utils.TokenManager
 import com.znhst.xtzb.viewModel.DeviceViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+val deviceTypeDrawableMap: Map<Int, Int> = mapOf(
+    1 to R.drawable.device_camera,  // Replace with actual drawable resource
+    2 to R.drawable.device_door,
+    3 to R.drawable.device_freezer,
+    4 to R.drawable.device_virus,
+    5 to R.drawable.device_smoke_alarm
+)
+
+fun getDeviceDrawable(type: Int): Int {
+    return deviceTypeDrawableMap[type] ?: R.drawable.device_hub // Default icon if type not found
+}
 
 @Composable
 fun DeviceCategory(deviceViewModel: DeviceViewModel, navController: NavController) {
@@ -50,8 +66,8 @@ fun DeviceCategory(deviceViewModel: DeviceViewModel, navController: NavControlle
             .fillMaxSize()
             .padding(16.dp),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp),
+        horizontalArrangement = Arrangement.spacedBy(24.dp)
     ) {
         items(deviceCategories.size) { index ->
             val category = deviceCategories[index]
@@ -83,17 +99,22 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
         elevation = CardDefaults.cardElevation(4.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
-            .clickable { onClickCard(category.type) }
-    ) {
+            .size(150.dp)
+            .clickable { onClickCard(category.type) }) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(Color.LightGray)
+                .background(Color(242, 237, 246,1))
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(
+                    painter = painterResource(id = getDeviceDrawable(category.type)),
+                    contentDescription = null,
+                    colorFilter = ColorFilter.tint(Color.DarkGray)
+                )
+                Spacer(Modifier.height(8.dp))
                 Text(text = category.displayName)
             }
         }

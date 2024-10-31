@@ -1,10 +1,13 @@
 package com.znhst.xtzb.ui.page
 
-
 import android.content.Intent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,9 +22,12 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import com.znhst.xtzb.R
 import com.znhst.xtzb.viewModel.AuthViewModel
@@ -51,6 +57,7 @@ val routes = listOf(
     MainScreenRoute.Profile,
 )
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
@@ -78,6 +85,13 @@ fun MainPage(
                         )
                     }
                 },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = if (outNavController.currentDestination?.route == "main") 0.dp else 2.dp,
+                        shape = RectangleShape,
+                        clip = true
+                    )
             )
         },
         bottomBar = {
