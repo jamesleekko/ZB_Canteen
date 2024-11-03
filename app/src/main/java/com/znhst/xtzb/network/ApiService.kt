@@ -23,6 +23,23 @@ import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
+data class UserInfoResponse(
+    @Json(name = "user") val user: UserInfo
+)
+
+data class Dept(
+    @Json(name = "id") val id: Long,
+    @Json(name = "name") val name: String
+)
+
+data class UserInfo(
+    @Json(name = "username") val userName: String,
+    @Json(name = "nickName") val nickName: String,
+    @Json(name = "avatarName") val avatarName: String?,
+    @Json(name = "dept") val dept: Dept,
+    @Json(name = "phone") val phone: String,
+)
+
 data class LoginUser(
     @Json(name = "username") val username: String,
     @Json(name = "password") val password: String,
@@ -148,6 +165,10 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     suspend fun getCaptcha(): CaptchaResponse
 
+    @GET("/auth/info")
+    @Headers("Content-Type: application/json")
+    suspend fun getUserInfo(): UserInfoResponse
+
     @POST("/api/lapp/token/get")
     @FormUrlEncoded
     @Headers("Content-Type: application/x-www-form-urlencoded")
@@ -216,6 +237,7 @@ interface ApiService {
         @Query("startTime", encoded = true) startTime: String,
         @Query("endTime", encoded = true) endTime: String
     ): DayufengResponse<DayufengData<DayufengHistoryData<SmokeAlarmEntry>>>
+
 }
 
 object ApiClient {

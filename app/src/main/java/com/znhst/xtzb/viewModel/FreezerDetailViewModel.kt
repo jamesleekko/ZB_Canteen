@@ -1,7 +1,9 @@
 package com.znhst.xtzb.viewModel
 
 import android.app.Application
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.znhst.xtzb.network.ApiClient
@@ -21,6 +23,7 @@ class FreezerDetailViewModel(application: Application) : AndroidViewModel(applic
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun fetchHistory(deviceNo: String) {
         viewModelScope.launch {
             try {

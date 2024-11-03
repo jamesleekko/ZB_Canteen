@@ -42,7 +42,14 @@ val deviceTypeDrawableMap: Map<Int, Int> = mapOf(
     2 to R.drawable.device_door,
     3 to R.drawable.device_freezer,
     4 to R.drawable.device_virus,
-    5 to R.drawable.device_smoke_alarm
+    5 to R.drawable.device_smoke_alarm,
+    6 to R.drawable.device_stock,
+    7 to R.drawable.device_food_detection,
+    8 to R.drawable.device_screen,
+    9 to R.drawable.device_ai_face,
+    10 to R.drawable.device_temp,
+    11 to R.drawable.device_temp,
+    12 to R.drawable.device_360
 )
 
 fun getDeviceDrawable(type: Int): Int {
