@@ -71,7 +71,7 @@ fun DeviceCategory(deviceViewModel: DeviceViewModel, navController: NavControlle
         columns = GridCells.Fixed(2), // 2 columns
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalArrangement = Arrangement.spacedBy(24.dp)

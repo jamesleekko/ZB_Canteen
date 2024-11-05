@@ -7,12 +7,19 @@ android {
     namespace = "com.znhst.xtzb"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.znhst.xtzb"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
+
+        buildConfigField("String", "EZ_URL", "\"https://open.ys7.com\"")
+        buildConfigField("String", "DYF_URL", "\"https://api.dayufeng.cn\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -37,6 +44,10 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com:8000\"")
+        }
+        debug {
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.3:8000\"")
         }
     }
     compileOptions {
@@ -77,6 +88,7 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
+    implementation(libs.bouquet)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.zxing.android.embedded)

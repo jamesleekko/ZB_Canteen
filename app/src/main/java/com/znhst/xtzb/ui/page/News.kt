@@ -17,12 +17,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.google.gson.Gson
+import com.znhst.xtzb.network.NewsItem
 
 @Composable
-fun News() {
+fun News(outNavController: NavController) {
     val navController = rememberNavController()
 
     fun onClickCommon() {
@@ -40,10 +45,10 @@ fun News() {
 
         NavHost(navController = navController, startDestination = "common_news", modifier = Modifier.padding(top = 56.dp)) {
             composable("common_news") {
-                CommonNews()
+                CommonNews(navController = navController, outNavController = outNavController)
             }
             composable("local_news") {
-                LocalNews()
+                LocalNews(navController = navController, outNavController = outNavController)
             }
         }
     }

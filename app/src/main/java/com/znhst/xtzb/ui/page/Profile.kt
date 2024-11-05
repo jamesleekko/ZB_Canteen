@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,10 +28,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.znhst.xtzb.BuildConfig
 import com.znhst.xtzb.viewModel.AuthViewModel
 import com.znhst.xtzb.viewModel.ProfileViewModel
-
-val baseUrl = "http://10.0.2.2:8000"
 
 @Composable
 fun Profile(
@@ -69,7 +67,7 @@ fun Profile(
 fun UserInfo(viewModel: ProfileViewModel) {
     val userInfo = viewModel.userInfo.value
     val avatarUrl = remember(userInfo.avatarName) {
-        "${baseUrl}/avatar/${userInfo.avatarName}"
+        "${BuildConfig.BASE_URL}/avatar/${userInfo.avatarName}"
     }
 
     Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {

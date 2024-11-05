@@ -1,5 +1,6 @@
 [versions]
 agp = "8.6.1"
+bouquet = "1.1.2"
 coil = "2.7.0"
 converterMoshi = "2.9.0"
 core = "3.4.1"
@@ -17,6 +18,7 @@ loggingInterceptor = "4.9.3"
 moshi = "1.15.0"
 moshiKotlin = "1.15.0"
 okhttp = "4.12.0"
+pdfViewerFragment = "1.0.0-alpha02"
 retrofit = "2.9.0"
 navigationRuntimeKtx = "2.8.1"
 navigationCompose = "2.8.1"
@@ -28,6 +30,7 @@ runtimeLivedata = "1.7.3"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleRuntimeKtx" }
+bouquet = { module = "io.github.grizzi91:bouquet", version.ref = "bouquet" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "converterMoshi" }

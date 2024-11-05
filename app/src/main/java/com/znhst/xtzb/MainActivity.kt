@@ -11,13 +11,18 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import com.znhst.xtzb.ui.page.AuthScreen
 import com.znhst.xtzb.ui.theme.ZB_CanteenTheme
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import com.google.gson.Gson
 import com.videogo.openapi.EZOpenSDK
 import com.znhst.xtzb.network.ApiClient
+import com.znhst.xtzb.network.NewsItem
+import com.znhst.xtzb.ui.page.ArticleViewer
 import com.znhst.xtzb.ui.page.CameraList
 import com.znhst.xtzb.ui.page.MainPage
 import com.znhst.xtzb.ui.page.RegisterScreen
@@ -93,5 +98,13 @@ fun MyMain(context: Context, tokenManager: TokenManager, viewModel: AuthViewMode
         composable("login") { AuthScreen(context, viewModel(), navController = navController) }
         composable("register") { RegisterScreen(viewModel(), navController = navController) }
         composable("main") { MainPage(outNavController = navController) }
+        composable(route = "article_viewer/{newsItem}",
+            arguments = listOf(navArgument("newsItem") {type= NavType.StringType})
+        ) {
+                backStackEntry ->
+            val newsItemJson = backStackEntry.arguments?.getString("newsItem")
+            val newsItem = Gson().fromJson(newsItemJson, NewsItem::class.java)
+            ArticleViewer(newsItem = newsItem)
+        }
     }
 }

@@ -5,8 +5,10 @@ import com.znhst.xtzb.utils.TokenManager
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.znhst.xtzb.BuildConfig
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo
+import com.znhst.xtzb.dataModel.EZNewsCategory
 import com.znhst.xtzb.dataModel.FreezerInfo
 import com.znhst.xtzb.dataModel.SmokeAlarmInfo
 import okhttp3.OkHttpClient
@@ -53,6 +55,37 @@ data class RegisterUser(
     @Json(name = "phone") val phone: String,
     @Json(name = "email") val email: String? = null,
 )
+
+data class NewsType(
+    @Json(name = "type") val type: Int,
+    @Json(name = "display_name") val displayName: String
+)
+
+data class NewsListResponse(
+    @Json(name = "list") val list: List<NewsItem>,
+    @Json(name = "total") val total: Int,
+)
+
+data class NewsItem(
+    @Json(name = "id") val id: Long,
+    @Json(name = "title") val title: String,
+    @Json(name = "typeName") val typeName: String?,
+    @Json(name = "kindName") val kindName: String,
+    @Json(name = "kindDisplayName") val kindDisplayName: String,
+    @Json(name = "fileName") val fileName: String?,
+    @Json(name = "filePath") val filePath: String?,
+    @Json(name = "content") val content: String?,
+    @Json(name = "deptName") val deptName: String?,
+    @Json(name = "updateTime") val updateTime: String,
+)
+
+data class NewsListRequest(
+    @Json(name = "type") val type: Int?,      // 新闻类型
+    @Json(name = "page") val page: Int?,      // 页码
+    @Json(name = "pageSize") val pageSize: Int?     // 每页数量
+)
+
+
 
 data class AACStatusParams(
     @Json(name = "accessToken") val accessToken: String,
@@ -238,6 +271,13 @@ interface ApiService {
         @Query("endTime", encoded = true) endTime: String
     ): DayufengResponse<DayufengData<DayufengHistoryData<SmokeAlarmEntry>>>
 
+    @GET("/news/category_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getNewsCategories(): List<EZNewsCategory>
+
+    @POST("/news/news_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getNewsList(@Body request: NewsListRequest): NewsListResponse
 }
 
 object ApiClient {
@@ -261,20 +301,20 @@ object ApiClient {
             .build()
 
         retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8000")
+            .baseUrl(BuildConfig.BASE_URL)
 //            .baseUrl("http://192.168.1.6:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
 
         ezRetrofit = Retrofit.Builder()
-            .baseUrl("https://open.ys7.com")
+            .baseUrl(BuildConfig.EZ_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()
 
         dayufengRetrofit = Retrofit.Builder()
-            .baseUrl("https://api.dayufeng.cn")
+            .baseUrl(BuildConfig.DYF_URL)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(dayufengClient)
             .build()

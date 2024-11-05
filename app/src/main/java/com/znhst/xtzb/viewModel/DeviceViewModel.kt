@@ -79,16 +79,4 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
-
-    fun fetchFreezerHistory(deviceNo: String) {
-        viewModelScope.launch {
-            try {
-                val result = ApiClient.apiService.getDayufengFreezers()
-                Log.d("拉取到冰箱列表:", result.toString())
-                _freezerList.value = result
-            } catch (e: Exception) {
-                _errorMessage.value = "Error fetching devices: ${e.message}"
-            }
-        }
-    }
 }
