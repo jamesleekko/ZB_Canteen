@@ -98,6 +98,10 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
             5 -> {
                 navController.navigate("smoke_alarm_list")
             }
+
+            12 -> {
+                navController.navigate("vr")
+            }
         }
     }
 

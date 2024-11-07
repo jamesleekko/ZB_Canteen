@@ -44,10 +44,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com:8000\"")
+            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.3:8000\"")
+            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com\"")
+//            buildConfigField("String", "BASE_URL", "\"http://192.168.1.3:8000\"")
+//            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000\"")
         }
     }
     compileOptions {
@@ -98,6 +100,8 @@ dependencies {
     implementation(libs.videotalk)
     implementation(libs.streamctrl)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.ui)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

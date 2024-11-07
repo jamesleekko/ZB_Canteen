@@ -13,6 +13,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -24,11 +26,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.znhst.xtzb.network.NewsItem
 import com.znhst.xtzb.viewModel.NewsViewModel
+
+val colors = listOf(
+    Color(0xFF5F8C6B), // Announcement
+    Color(0xFF6168A7), // News
+    Color(0xFF7363A7), // Spotlight
+    Color(0xFFA05A89), // Training
+    Color(0xFFC2694E), // Files
+    Color(0xFFB68A4D), // Topic
+    Color(0xFF6C9975)  // Nutrition
+)
 
 @Composable
 fun CommonNews(
@@ -37,15 +50,19 @@ fun CommonNews(
     outNavController: NavController
 ) {
     val categories by newsViewModel.categoryList.collectAsState()
+
+    var currentPage by remember { mutableStateOf(0) }
+    var pageSize by remember { mutableStateOf(10) }
     val currentNewsList by newsViewModel.currentNewsList.collectAsState()
     val currentTotal by newsViewModel.currentTotal.collectAsState()
+
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     newsViewModel.fetchCategories()
     LaunchedEffect(categories, selectedTabIndex) {
         if (categories.isNotEmpty()) {
             val selectedCategoryType = categories[selectedTabIndex].type
-            newsViewModel.fetchNews(selectedCategoryType)
+            newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
         }
     }
 
@@ -57,16 +74,26 @@ fun CommonNews(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 0.dp),
-                edgePadding = 0.dp
+                edgePadding = 0.dp,
+                indicator = {tabPositions ->
+                    SecondaryIndicator(
+                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        color = colors[selectedTabIndex]
+                    )
+                }
             ) {
                 categories.forEachIndexed { index, item ->
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = {
                             selectedTabIndex = index
-                            newsViewModel.fetchNews(categories[selectedTabIndex].type)
+                            newsViewModel.fetchNews(
+                                categories[selectedTabIndex].type,
+                                currentPage,
+                                pageSize
+                            )
                         },
-                        text = { Text(item.displayName) }
+                        text = { Text(item.displayName, color = colors[index], fontSize = 16.sp) }
                     )
                 }
             }

@@ -12,7 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -55,7 +57,7 @@ fun CodeScanScreen() {
     val context = LocalContext.current
     var hasCameraPermission by remember { mutableStateOf(false) }
     var scannedData by remember { mutableStateOf<String?>(null) }
-    var showScanner by remember { mutableStateOf(true) }
+    var showScanner by remember { mutableStateOf(false) }
     var isDialogVisible by remember { mutableStateOf(false) }
 
     // 请求摄像头权限
@@ -64,6 +66,7 @@ fun CodeScanScreen() {
     ) { isGranted ->
         Log.d("权限", isGranted.toString())
         hasCameraPermission = isGranted
+        showScanner = isGranted
     }
 
     // 使用 LaunchedEffect 确保权限请求只在初始化完成后执行
@@ -74,6 +77,7 @@ fun CodeScanScreen() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             hasCameraPermission = true
+            showScanner = true
         } else {
             cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
@@ -111,7 +115,8 @@ fun CodeScanScreen() {
                     .padding(16.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(text = "Scanned QR Code: $scannedData")
+//                Text(text = "Scanned QR Code: $scannedData")
+                Text("库存系统正在开发...")
                 if (isDialogVisible && scannedData != null) {
                     ScanResultDialog(
                         scannedResult = scannedData!!,
@@ -193,7 +198,11 @@ fun ScanResultDialog(scannedResult: String, onDismiss: () -> Unit) {
             Text(text = "扫描结果")
         },
         text = {
-            Text(text = "Scanned QR Code: $scannedResult")
+            Column {
+                Text(text = scannedResult)
+                Spacer(Modifier.height(54.dp))
+                Text(text = "库存系统正在开发...")
+            }
         }
     )
 }

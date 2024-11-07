@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val tokenManager = TokenManager(this)
+//        tokenManager.clearToken()
 
         val appKey = "1c66441dc45f4e939689a2ba4b901bcd"
         val secretKey = "146aa934f75321813042020a9237ee86"
@@ -104,7 +105,7 @@ fun MyMain(context: Context, tokenManager: TokenManager, viewModel: AuthViewMode
                 backStackEntry ->
             val newsItemJson = backStackEntry.arguments?.getString("newsItem")
             val newsItem = Gson().fromJson(newsItemJson, NewsItem::class.java)
-            ArticleViewer(newsItem = newsItem)
+            ArticleViewer(newsItem = newsItem, outNavController = navController)
         }
     }
 }

@@ -26,6 +26,8 @@ streamctrl = "1.3.0"
 videotalk = "1.3.0"
 zxingAndroidEmbedded = "4.3.0"
 runtimeLivedata = "1.7.3"
+media3Exoplayer = "1.4.1"
+media3Ui = "1.4.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +63,8 @@ streamctrl = { module = "io.github.ezviz-open:streamctrl", version.ref = "stream
 videotalk = { module = "io.github.ezviz-open:videotalk", version.ref = "videotalk" }
 zxing-android-embedded = { module = "com.journeyapps:zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "runtimeLivedata" }
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3Exoplayer" }
+androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3Ui" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

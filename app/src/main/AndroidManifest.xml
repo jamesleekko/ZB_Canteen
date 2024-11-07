@@ -27,17 +27,17 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
-<!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
-<!--    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
+    <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
+    <!--    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ZB_Canteen"
         tools:targetApi="31">
@@ -45,6 +45,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.ZB_Canteen"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
@@ -53,9 +54,13 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.CodeScanActivity" />
+        <activity
+            android:name=".activity.CodeScanActivity"
+            android:screenOrientation="portrait" />
 
-        <activity android:name=".activity.EZCameraActivity" />
+        <activity
+            android:name=".activity.EZCameraActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

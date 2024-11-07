@@ -17,9 +17,14 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -243,6 +248,15 @@ fun CameraScreen(
                 }
             }, modifier = Modifier.fillMaxSize()
         )
+
+        SmallFloatingActionButton(
+            onClick = {(context as? Activity)?.finish()},
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
+        ) {
+            Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
+        }
     }
 
     Column(
