@@ -1,14 +1,23 @@
 package com.znhst.xtzb.ui.page
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
@@ -24,12 +33,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.google.gson.Gson
+import com.znhst.xtzb.R
 import com.znhst.xtzb.network.NewsItem
 import com.znhst.xtzb.viewModel.NewsViewModel
 
@@ -73,12 +86,20 @@ fun CommonNews(
                 selectedTabIndex = selectedTabIndex,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
+                    .padding(horizontal = 0.dp)
+                    .background(MaterialTheme.colorScheme.surface),
                 edgePadding = 0.dp,
-                indicator = {tabPositions ->
-                    SecondaryIndicator(
-                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                        color = colors[selectedTabIndex]
+                indicator = { tabPositions ->
+//                    SecondaryIndicator(
+//                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+//                        color = colors[selectedTabIndex]
+//                    )
+                    Box(
+                        Modifier
+                            .tabIndicatorOffset(tabPositions[selectedTabIndex])
+                            .height(4.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(colors[selectedTabIndex])
                     )
                 }
             ) {
@@ -93,7 +114,13 @@ fun CommonNews(
                                 pageSize
                             )
                         },
-                        text = { Text(item.displayName, color = colors[index], fontSize = 16.sp) }
+                        text = {
+                            Text(
+                                item.displayName,
+                                color = if (selectedTabIndex == index) colors[index] else Color.Gray,
+                                fontSize = 16.sp
+                            )
+                        }
                     )
                 }
             }
@@ -113,7 +140,7 @@ fun CommonNews(
         ) {
             items(currentNewsList) { newsItem ->
                 NewsItemRow(newsItem, outNavController)
-                HorizontalDivider(color = Color.LightGray, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(6.dp))
             }
         }
     }
@@ -127,30 +154,74 @@ fun NewsItemRow(newsItem: NewsItem, outNavController: NavController) {
         outNavController.navigate("article_viewer/${newsItemJson}")
     }
 
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
-            .clickable {
-                onClickArticle()
-            }
+            .padding(vertical = 8.dp)
+            .clickable { onClickArticle() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Text(
-            text = newsItem.title,
-            style = MaterialTheme.typography.headlineSmall, // Material 3 headline style
-            color = MaterialTheme.colorScheme.onSurface // Adjusting color to match Material 3 color scheme
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "概述...",
-            style = MaterialTheme.typography.bodyMedium, // Material 3 body style
-            color = MaterialTheme.colorScheme.onSurfaceVariant // Variant for a less emphasized look
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = newsItem.updateTime,
-            style = MaterialTheme.typography.bodySmall, // Smaller text for timestamps
-            color = MaterialTheme.colorScheme.outline // Light gray for timestamps
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ArticlePreview(item = newsItem)
+                Text(
+                    text = newsItem.title,
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val typeName = when (newsItem.kindName) {
+                    "video" -> "视频"
+                    "pdf" -> "PDF文档"
+                    "word" -> "Word文档"
+                    else -> "未知类型"
+                }
+
+                Text(
+                    text = "类别: $typeName",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+
+                Text(
+                    text = newsItem.updateTime,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ArticlePreview(item: NewsItem) {
+    val icon = when (item.kindName) {
+        "video" -> painterResource(id = R.drawable.article_mp4)
+        "pdf" -> painterResource(id = R.drawable.article_pdf)
+        "word" -> painterResource(id = R.drawable.article_doc)
+        else -> painterResource(id = R.drawable.article_unknown)
+    }
+
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
+            .padding(8.dp)
+    ) {
+        Image(
+            painter = icon,
+            contentDescription = null,
+            modifier = Modifier.size(48.dp) // 图标大小
         )
     }
 }

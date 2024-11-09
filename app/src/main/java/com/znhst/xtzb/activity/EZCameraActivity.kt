@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
@@ -119,7 +120,6 @@ fun CameraScreen(
     val context = LocalContext.current
 
     val ezViewModel = EZViewModel(application)
-    val token by ezViewModel.accessToken.observeAsState("")
 
     LaunchedEffect(Unit) {
         isSoundOpen = localInfo.isSoundOpen
@@ -249,13 +249,30 @@ fun CameraScreen(
             }, modifier = Modifier.fillMaxSize()
         )
 
-        SmallFloatingActionButton(
-            onClick = {(context as? Activity)?.finish()},
-            containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
-        ) {
-            Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
+//        SmallFloatingActionButton(
+//            onClick = {(context as? Activity)?.finish()},
+//            containerColor = MaterialTheme.colorScheme.primary,
+//            contentColor = MaterialTheme.colorScheme.secondary,
+//            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
+//        ) {
+//            Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
+//        }
+
+        Box() {
+            IconButton(
+                onClick = {(context as? Activity)?.finish()},
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp)
+                    .size(36.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "退出",
+                    tint = Color.White
+                )
+            }
         }
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -82,7 +83,8 @@ fun TopStickyHeader(currentPlate: String, onClickCommon: () -> Unit, onClickLoca
                     Text(
                         "公共",
                         fontSize = 16.sp,
-                        color = if (currentPlate == "common") MaterialTheme.colorScheme.primary else Color.Gray
+                        color = if (currentPlate == "common") MaterialTheme.colorScheme.primary else Color.Gray,
+                        fontWeight = if (currentPlate == "common") FontWeight.Bold else FontWeight.Normal
                     )
                 }
                 Spacer(Modifier.width(8.dp))
@@ -90,7 +92,8 @@ fun TopStickyHeader(currentPlate: String, onClickCommon: () -> Unit, onClickLoca
                     Text(
                         "本地",
                         fontSize = 16.sp,
-                        color = if (currentPlate == "local") MaterialTheme.colorScheme.primary else Color.Gray
+                        color = if (currentPlate == "local") MaterialTheme.colorScheme.primary else Color.Gray,
+                        fontWeight = if (currentPlate == "local") FontWeight.Bold else FontWeight.Normal
                     )
                 }
             }

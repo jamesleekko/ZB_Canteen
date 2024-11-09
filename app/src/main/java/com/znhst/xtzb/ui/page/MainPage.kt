@@ -128,7 +128,7 @@ fun MainPage(
                     )
                 }
                 composable(MainScreenRoute.Profile.route) { Profile(viewModel, outNavController) }
-                composable("camera_list") { CameraList() }
+                composable("camera_list") { CameraList(navController = mainPageNavController) }
                 composable(
                     route = "freezer_list"
                 ) {
