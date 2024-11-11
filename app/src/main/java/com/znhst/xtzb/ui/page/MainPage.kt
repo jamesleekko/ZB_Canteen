@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat.startActivity
 import com.znhst.xtzb.R
 import com.znhst.xtzb.viewModel.AuthViewModel
@@ -102,7 +103,7 @@ fun MainPage(
                                 contentDescription = screen.route
                             )
                         },
-                        label = { Text(screen.title) },
+                        label = { Text(screen.title, fontSize = 14.sp) },
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index

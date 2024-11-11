@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -99,6 +100,8 @@ fun UserInfo(viewModel: ProfileViewModel) {
                 UserInfoRow(label = "手机号码", value = userInfo.phone, showDivider = false)
             }
         }
+
+//        DisplayColorScheme()
     }
 }
 
@@ -130,6 +133,27 @@ fun UserInfoRow(label: String, value: String, showDivider: Boolean) {
         color = Color.LightGray.copy(alpha = 0.5f), // 设置所需颜色
         thickness = 1.dp
     )
+}
+
+@Composable
+fun DisplayColorScheme() {
+    val colorScheme = MaterialTheme.colorScheme
+    Column {
+        Text("Primary", color = colorScheme.primary)
+        Text("OnPrimary", color = colorScheme.onPrimary)
+        Text("PrimaryContainer", color = colorScheme.primaryContainer)
+        Text("OnPrimaryContainer", color = colorScheme.onPrimaryContainer)
+        Text("Secondary", color = colorScheme.secondary)
+        Text("OnSecondary", color = colorScheme.onSecondary)
+        Text("SecondaryContainer", color = colorScheme.secondaryContainer)
+        Text("OnSecondaryContainer", color = colorScheme.onSecondaryContainer)
+        Text("Tertiary", color = colorScheme.tertiary)
+        Text("OnTertiary", color = colorScheme.onTertiary)
+        Text("Background", color = colorScheme.background)
+        Text("OnBackground", color = colorScheme.onBackground)
+        Text("Surface", color = colorScheme.surface)
+        Text("OnSurface", color = colorScheme.onSurface)
+    }
 }
 
 fun logout(viewModel: AuthViewModel, navController: NavController) {

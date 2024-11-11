@@ -95,4 +95,14 @@
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
 # 必须额外加的，否则编译无法通过
 -dontwarn okio.**
+
+# 腾讯X5
+-dontwarn dalvik.**
+-dontwarn com.tencent.smtt.**
+-keep class com.tencent.smtt.** {
+    *;
+}
+-keep class com.tencent.tbs.** {
+    *;
+}
 #========以上是第三方开源库=======#

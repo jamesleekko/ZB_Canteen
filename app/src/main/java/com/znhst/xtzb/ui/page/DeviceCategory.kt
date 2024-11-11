@@ -1,5 +1,6 @@
 package com.znhst.xtzb.ui.page
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,8 +32,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.znhst.xtzb.R
+import com.znhst.xtzb.activity.VRActivity
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.viewModel.DeviceViewModel
 import kotlinx.coroutines.Dispatchers
@@ -85,6 +89,8 @@ fun DeviceCategory(deviceViewModel: DeviceViewModel, navController: NavControlle
 
 @Composable
 fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController) {
+    val context = LocalContext.current
+
     fun onClickCard(type: Int) {
         when (type) {
             1 -> {
@@ -100,7 +106,9 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
             }
 
             12 -> {
-                navController.navigate("vr")
+//                navController.navigate("vr")
+                val intent = Intent(context, VRActivity::class.java)
+                context.startActivity(intent)
             }
         }
     }
@@ -111,11 +119,13 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
         modifier = Modifier
             .fillMaxWidth()
             .size(150.dp)
-            .clickable { onClickCard(category.type) }) {
+            .clickable { onClickCard(category.type) },
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary)
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(Color(242, 237, 246,1))
+                .background(Color(242, 237, 246, 1))
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
@@ -123,10 +133,11 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
                 Image(
                     painter = painterResource(id = getDeviceDrawable(category.type)),
                     contentDescription = null,
-                    colorFilter = ColorFilter.tint(Color.DarkGray)
+                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier.size(56.dp)
                 )
                 Spacer(Modifier.height(8.dp))
-                Text(text = category.displayName)
+                Text(text = category.displayName, color = Color.White, fontSize = 18.sp)
             }
         }
     }

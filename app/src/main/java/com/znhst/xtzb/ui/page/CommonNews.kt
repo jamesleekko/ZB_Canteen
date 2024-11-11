@@ -18,11 +18,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -89,18 +87,15 @@ fun CommonNews(
                     .padding(horizontal = 0.dp)
                     .background(MaterialTheme.colorScheme.surface),
                 edgePadding = 0.dp,
-                indicator = { tabPositions ->
-//                    SecondaryIndicator(
-//                        Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-//                        color = colors[selectedTabIndex]
+                indicator = {
+//                    tabPositions ->
+//                    Box(
+//                        Modifier
+//                            .tabIndicatorOffset(tabPositions[selectedTabIndex])
+//                            .height(4.dp)
+//                            .clip(RoundedCornerShape(50))
+//                            .background(colors[selectedTabIndex])
 //                    )
-                    Box(
-                        Modifier
-                            .tabIndicatorOffset(tabPositions[selectedTabIndex])
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(50))
-                            .background(colors[selectedTabIndex])
-                    )
                 }
             ) {
                 categories.forEachIndexed { index, item ->
@@ -114,10 +109,17 @@ fun CommonNews(
                                 pageSize
                             )
                         },
+                        modifier = Modifier
+                            .padding(4.dp) // 添加一点内边距
+                            .clip(RoundedCornerShape(5.dp)) // 圆角背景
+                            .background(
+                                if (selectedTabIndex == index) colors[index] else Color.Transparent
+                            ), // 选中时背景为对应颜色
                         text = {
                             Text(
                                 item.displayName,
-                                color = if (selectedTabIndex == index) colors[index] else Color.Gray,
+                                color = if (selectedTabIndex == index) Color.White else Color.Gray,
+                                fontWeight = if(selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
                                 fontSize = 16.sp
                             )
                         }

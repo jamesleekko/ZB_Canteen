@@ -12,20 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
-import com.znhst.xtzb.ui.page.AuthScreen
-import com.znhst.xtzb.ui.theme.ZB_CanteenTheme
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
+import com.tencent.smtt.sdk.QbSdk
 import com.videogo.openapi.EZOpenSDK
 import com.znhst.xtzb.network.ApiClient
 import com.znhst.xtzb.network.NewsItem
 import com.znhst.xtzb.ui.page.ArticleViewer
-import com.znhst.xtzb.ui.page.CameraList
+import com.znhst.xtzb.ui.page.AuthScreen
 import com.znhst.xtzb.ui.page.MainPage
 import com.znhst.xtzb.ui.page.RegisterScreen
+import com.znhst.xtzb.ui.theme.ZB_CanteenTheme
 import com.znhst.xtzb.utils.TokenManager
 import com.znhst.xtzb.viewModel.AuthViewModel
 import com.znhst.xtzb.viewModel.EZViewModel
@@ -74,6 +74,21 @@ class MainActivity : ComponentActivity() {
                 Log.e("EZ Init Error", "Failed to init: ${e.message}")
             }
         }
+
+        QbSdk.setDownloadWithoutWifi(true)
+        QbSdk.initX5Environment(application, object : QbSdk.PreInitCallback {
+            override fun onCoreInitFinished() {
+                // 内核初始化完成，可能为系统内核，也可能为系统内核
+            }
+
+            /**
+             * 预初始化结束
+             * 由于X5内核体积较大，需要依赖网络动态下发，所以当内核不存在的时候，默认会回调false，此时将会使用系统内核代替
+             * @param isX5 是否使用X5内核
+             */
+            override fun onViewInitFinished(isX5: Boolean) {
+            }
+        })
     }
 }
 
