@@ -15,9 +15,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
@@ -30,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -66,6 +69,7 @@ fun CommonNews(
     var pageSize by remember { mutableStateOf(10) }
     val currentNewsList by newsViewModel.currentNewsList.collectAsState()
     val currentTotal by newsViewModel.currentTotal.collectAsState()
+    val listState = rememberLazyListState()
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
@@ -75,6 +79,18 @@ fun CommonNews(
             val selectedCategoryType = categories[selectedTabIndex].type
             newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
         }
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo.lastOrNull() }
+            .collect { lastVisibleItem ->
+                if (lastVisibleItem != null && lastVisibleItem.index == currentNewsList.size - 1) {
+                    if (currentNewsList.size < currentTotal) {
+                        currentPage += 1
+                        newsViewModel.fetchNews(categories[selectedTabIndex].type, currentPage, pageSize)
+                    }
+                }
+            }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -103,6 +119,7 @@ fun CommonNews(
                         selected = selectedTabIndex == index,
                         onClick = {
                             selectedTabIndex = index
+                            currentPage = 0
                             newsViewModel.fetchNews(
                                 categories[selectedTabIndex].type,
                                 currentPage,
@@ -136,6 +153,7 @@ fun CommonNews(
         }
 
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
@@ -143,6 +161,20 @@ fun CommonNews(
             items(currentNewsList) { newsItem ->
                 NewsItemRow(newsItem, outNavController)
                 Spacer(modifier = Modifier.height(6.dp))
+            }
+
+            // 加载更多提示
+            if (currentNewsList.size < currentTotal) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
+                }
             }
         }
     }

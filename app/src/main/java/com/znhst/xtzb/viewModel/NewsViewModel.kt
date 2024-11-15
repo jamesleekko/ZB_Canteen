@@ -2,8 +2,6 @@ package com.znhst.xtzb.viewModel
 
 import android.app.Application
 import android.util.Log
-import android.util.Size
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.znhst.xtzb.dataModel.EZNewsCategory
@@ -21,8 +19,10 @@ class NewsViewModel(application: Application): AndroidViewModel(application) {
     private val _currentNewsList = MutableStateFlow<List<NewsItem>>(emptyList())
     val currentNewsList: StateFlow<List<NewsItem>> = _currentNewsList
 
-    private val _currentTotal = MutableStateFlow<Int?>(null)
-    val currentTotal: StateFlow<Int?> = _currentTotal
+    private val _currentTotal = MutableStateFlow<Int>(0)
+    val currentTotal: StateFlow<Int> = _currentTotal
+
+    private var lastFetchedType: Int? = null
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -44,9 +44,18 @@ class NewsViewModel(application: Application): AndroidViewModel(application) {
             try {
                 val request = NewsListRequest(type = type, page = page, pageSize = pageSize)
                 val result = ApiClient.apiService.getNewsList(request)
-                _currentNewsList.value = result.list
+
+                // 如果类型发生变化，则重置列表
+                if (type != lastFetchedType) {
+                    _currentNewsList.value = result.list
+                    lastFetchedType = type // 更新上次请求的类型
+                } else {
+                    // 增量加载新闻列表
+                    _currentNewsList.value += result.list
+                }
+
                 _currentTotal.value = result.total
-                Log.d("拉取到新闻列表:", result.list.toString())
+                Log.d("加载到新闻列表:", result.list.toString())
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching news list: ${e.message}"
                 Log.e("Error fetching news list: ",e.message.toString())
