@@ -6,6 +6,7 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.znhst.xtzb.BuildConfig
+import com.znhst.xtzb.dataModel.DoorInfo
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo
 import com.znhst.xtzb.dataModel.EZNewsCategory
@@ -83,14 +84,6 @@ data class NewsListRequest(
     @Json(name = "type") val type: Int?,      // 新闻类型
     @Json(name = "page") val page: Int?,      // 页码
     @Json(name = "pageSize") val pageSize: Int?     // 每页数量
-)
-
-
-
-data class AACStatusParams(
-    @Json(name = "accessToken") val accessToken: String,
-    @Json(name = "deviceSerial") val deviceSerial: String,
-    @Json(name = "localIndex") val localIndex: String?,
 )
 
 data class EZTokenResponse(
@@ -180,6 +173,20 @@ data class SmokeAlarmEntry(
     @Json(name = "id") val id: Int
 )
 
+data class DoorOperationEntry(
+    @Json(name = "log_sn") val logSn: String,
+    @Json(name = "door_guid") val doorGuid: String,
+    @Json(name = "door_name") val doorName: String,
+    @Json(name = "member_xm") val memberXm: String,
+    @Json(name = "visit_time") val visitTime: String,
+    @Json(name = "img_url") val imgUrl: String?,
+    @Json(name = "open_way") val openWay: Int,
+    // 开门方式 1:二维码 2:刷卡 3:人脸 4:密码' 5：扫码开门 9：远程开门
+    @Json(name = "open_status") val openStatus: Int,
+    // 开门状态 1:成功 2:失败
+    @Json(name = "remark") val remark: String,
+)
+
 interface ApiService {
 
     @POST("/api/users/register")
@@ -210,22 +217,9 @@ interface ApiService {
         @Field("appSecret") appSecret: String
     ): EZTokenOuterResponse
 
-    @GET("/api/service/media/aac/transfer")
+    @GET("/dayufeng/token")
     @Headers("Content-Type: application/json")
-    suspend fun getAACTransferStatus(
-        @Header("accessToken") accessToken: String,
-        @Header("deviceSerial") deviceSerial: String,
-        @Header("localIndex") localIndex: String?
-    ): AACTransferStatusResponse
-
-    @POST("/api/service/media/aac/transfer")
-    @Headers("Content-Type: application/json")
-    suspend fun setAACTransferStatus(
-        @Header("accessToken") accessToken: String,
-        @Header("deviceSerial") deviceSerial: String,
-        @Header("localIndex") localIndex: String?,
-        @Query("enable") enable: Int
-    ): AACSettingStatusResponse
+    suspend fun getDayufengToken(): String
 
     @GET("/zb/device_category_list")
     @Headers("Content-Type: application/json")
@@ -235,10 +229,6 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     suspend fun getCameras(): List<EZDeviceInfo>
 
-    @GET("/dayufeng/token")
-    @Headers("Content-Type: application/json")
-    suspend fun getDayufengToken(): String
-
     @GET("/dayufeng/freezer_list")
     @Headers("Content-Type: application/json")
     suspend fun getDayufengFreezers(): List<FreezerInfo>
@@ -246,6 +236,10 @@ interface ApiService {
     @GET("/dayufeng/smoke_alarm_list")
     @Headers("Content-Type: application/json")
     suspend fun getDayufengSmokeAlarms(): List<SmokeAlarmInfo>
+
+    @GET("/dayufeng/door_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getDayufengDoors(): List<DoorInfo>
 
     @GET("/devices_data_v2")
     @Headers("Content-Type: application/json")
@@ -270,6 +264,18 @@ interface ApiService {
         @Query("startTime", encoded = true) startTime: String,
         @Query("endTime", encoded = true) endTime: String
     ): DayufengResponse<DayufengData<DayufengHistoryData<SmokeAlarmEntry>>>
+
+    @GET("/door_log_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getDoorHistory(
+        @Header("Authorization") token: String,
+        @Query("login_type") loginType: Int,
+        @Query("door_guid") doorGuid: String?,
+        @Query("page") page: Int?,
+        @Query("per_page") limit: Int?,
+        @Query("start_time", encoded = true) startTime: String?,
+        @Query("end_time", encoded = true) endTime: String?
+    ): DayufengResponse<DayufengData<List<DoorOperationEntry>>>
 
     @GET("/news/category_list")
     @Headers("Content-Type: application/json")
@@ -323,6 +329,7 @@ object ApiClient {
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }
+
     val ezApiService: ApiService by lazy {
         ezRetrofit.create(ApiService::class.java)
     }

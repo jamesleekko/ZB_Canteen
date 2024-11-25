@@ -97,6 +97,10 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
                 navController.navigate("camera_list")
             }
 
+            2 -> {
+                navController.navigate("door_list")
+            }
+
             3 -> {
                 navController.navigate("freezer_list")
             }

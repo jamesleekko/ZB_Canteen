@@ -131,6 +131,11 @@ fun MainPage(
                 composable(MainScreenRoute.Profile.route) { Profile(viewModel, outNavController) }
                 composable("camera_list") { CameraList(navController = mainPageNavController) }
                 composable(
+                    route = "door_list"
+                ) {
+                    DoorList(navController = mainPageNavController)
+                }
+                composable(
                     route = "freezer_list"
                 ) {
                     FreezerList(navController = mainPageNavController)
@@ -153,6 +158,13 @@ fun MainPage(
                 ) { backStackEntry ->
                     val deviceNo = backStackEntry.arguments?.getString("deviceNo")
                     SmokeAlarmDetail(deviceNo = deviceNo!!)
+                }
+                composable(
+                    route = "door_detail/{doorGuid}",
+                    arguments = listOf(navArgument("doorGuid") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val doorGuid = backStackEntry.arguments?.getString("doorGuid")
+                    DoorDetail(doorGuid = doorGuid!!, mainPageNavController)
                 }
                 composable(
                     route = "vr"

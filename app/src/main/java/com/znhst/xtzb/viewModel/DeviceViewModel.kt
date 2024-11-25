@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.znhst.xtzb.dataModel.DoorInfo
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo
 import com.znhst.xtzb.dataModel.FreezerInfo
@@ -28,6 +29,9 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _smokeAlarmList = MutableStateFlow<List<SmokeAlarmInfo>>(emptyList())
     val smokeAlarmList: StateFlow<List<SmokeAlarmInfo>> = _smokeAlarmList
+
+    private val _doorList = MutableStateFlow<List<DoorInfo>>(emptyList())
+    val doorList: StateFlow<List<DoorInfo>> = _doorList
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -56,6 +60,18 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun fetchDoors() {
+        viewModelScope.launch {
+            try {
+                val result = ApiClient.apiService.getDayufengDoors()
+                Log.d("拉取到门禁设备列表:", result.toString())
+                _doorList.value = result
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching doors: ${e.message}"
+            }
+        }
+    }
+
     fun fetchFreezers() {
         viewModelScope.launch {
             try {
@@ -63,7 +79,7 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
                 Log.d("拉取到冰箱列表:", result.toString())
                 _freezerList.value = result
             } catch (e: Exception) {
-                _errorMessage.value = "Error fetching devices: ${e.message}"
+                _errorMessage.value = "Error fetching freezers: ${e.message}"
             }
         }
     }

@@ -24,3 +24,11 @@ data class SmokeAlarmInfo(
     val deviceNo: String,
     val deviceAlias: String,
 )
+
+data class DoorInfo(
+    val doorSN: String,
+    val doorGuid: String,
+    val doorName: String,
+    val doorStatus: Int,
+    val lineWay: String,
+)

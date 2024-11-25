@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.znhst.xtzb"
-    compileSdk = 34
+    compileSdk = 35
 
     buildFeatures {
         buildConfig = true
@@ -47,9 +47,9 @@ android {
             buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com\"")
         }
         debug {
-            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com\"")
-//            buildConfigField("String", "BASE_URL", "\"http://192.168.1.3:8000\"")
-//            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000\"")
+//            buildConfigField("String", "BASE_URL", "\"http://www.hnxtzb.com\"")
+//            buildConfigField("String", "BASE_URL", "\"http://192.168.1.12:8000\"")
+            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8000\"")
         }
     }
     compileOptions {
@@ -90,7 +90,6 @@ dependencies {
     implementation(libs.converter.moshi)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
-    implementation(libs.bouquet)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.zxing.android.embedded)
@@ -105,6 +104,7 @@ dependencies {
     implementation(libs.androidx.browser)
     implementation(libs.tbssdk)
     implementation(libs.androidx.appcompat)
+    implementation(libs.jetpdfvue)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

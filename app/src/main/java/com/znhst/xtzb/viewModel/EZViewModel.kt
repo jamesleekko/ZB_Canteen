@@ -28,29 +28,4 @@ class EZViewModel(application: Application) : AndroidViewModel(application) {
             Result.failure(Exception("获取萤石token失败: ${e.message}"))
         }
     }
-
-    suspend fun getAACTransferStatus(accessToken: String, deviceSerial: String): Result<String> {
-        Log.d("start aac", "$accessToken $deviceSerial")
-        return try {
-            val response = ApiClient.ezApiService.getAACTransferStatus(accessToken = accessToken, deviceSerial = deviceSerial, localIndex = null)
-            response.data.let { Log.d("aac enable status", it.enable.toString()) }
-            Result.success("aac状态获取成功")
-        } catch (e: HttpException) {
-            Result.failure(Exception("获取aac状态失败: ${e.message()}"))
-        } catch (e: ApiException) {
-            Result.failure(Exception("获取acc状态失败: ${e.message}"))
-        }
-    }
-
-    suspend fun setAACTransferStatus(accessToken: String, deviceSerial: String, enable: Int):Result<String> {
-        Log.d("start aac set", "$accessToken $deviceSerial")
-        return try {
-            ApiClient.ezApiService.setAACTransferStatus(accessToken = accessToken, deviceSerial = deviceSerial, localIndex = null, enable = enable)
-            Result.success("aac状态设置成功")
-        } catch (e: HttpException) {
-            Result.failure(Exception("设置aac状态失败: ${e.message()}"))
-        } catch (e: ApiException) {
-            Result.failure(Exception("设置acc状态失败: ${e.message}"))
-        }
-    }
 }
