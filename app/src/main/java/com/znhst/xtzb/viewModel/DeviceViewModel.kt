@@ -9,6 +9,8 @@ import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo
 import com.znhst.xtzb.dataModel.FreezerInfo
 import com.znhst.xtzb.dataModel.SmokeAlarmInfo
+import com.znhst.xtzb.dataModel.TempHumiInfo
+import com.znhst.xtzb.dataModel.TempHumiCategory
 import com.znhst.xtzb.network.ApiClient
 import com.znhst.xtzb.utils.TokenManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +34,9 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
 
     private val _doorList = MutableStateFlow<List<DoorInfo>>(emptyList())
     val doorList: StateFlow<List<DoorInfo>> = _doorList
+
+    private val _tempHumiList = MutableStateFlow<List<TempHumiInfo>>(emptyList())
+    val tempHumiList: StateFlow<List<TempHumiInfo>> = _tempHumiList
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
@@ -92,6 +97,18 @@ class DeviceViewModel(application: Application) : AndroidViewModel(application) 
                 _smokeAlarmList.value = result
             } catch (e: Exception) {
                 _errorMessage.value = "Error fetching devices: ${e.message}"
+            }
+        }
+    }
+
+    fun fetchTempHumis(category: TempHumiCategory) {
+        viewModelScope.launch {
+            try {
+                val result = ApiClient.apiService.getTempHumis(category)
+                Log.d("拉取到温度湿度传感器列表:", result.toString())
+                _tempHumiList.value = result
+            } catch (e: Exception) {
+                _errorMessage.value = "Error fetching temp&humis: ${e.message}"
             }
         }
     }

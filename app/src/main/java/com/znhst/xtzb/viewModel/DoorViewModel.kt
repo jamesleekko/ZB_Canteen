@@ -11,9 +11,6 @@ import com.znhst.xtzb.network.DoorOperationEntry
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 class DoorViewModel(application: Application) : AndroidViewModel(application) {
 

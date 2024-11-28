@@ -38,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.znhst.xtzb.activity.CodeScanActivity
+import com.znhst.xtzb.dataModel.TempHumiCategory
 import com.znhst.xtzb.viewModel.DeviceViewModel
 
 sealed class MainScreenRoute(
@@ -136,6 +137,11 @@ fun MainPage(
                     DoorList(navController = mainPageNavController)
                 }
                 composable(
+                    route = "stock"
+                ) {
+                    StockScreen(navController = mainPageNavController)
+                }
+                composable(
                     route = "freezer_list"
                 ) {
                     FreezerList(navController = mainPageNavController)
@@ -144,6 +150,16 @@ fun MainPage(
                     route = "smoke_alarm_list"
                 ) {
                     SmokeAlarmList(navController = mainPageNavController)
+                }
+                composable(
+                    route = "temp_humi_list/{category}",
+                    arguments = listOf(
+                        navArgument("category") { type = NavType.StringType } // 将枚举传递为字符串
+                    )
+                ) { backStackEntry ->
+                    val categoryString = backStackEntry.arguments?.getString("category")
+                    val category = TempHumiCategory.valueOf(categoryString!!) // 将字符串转回枚举
+                    TempHumiList(navController = mainPageNavController, category = category)
                 }
                 composable(
                     route = "freezer_detail/{deviceNo}",
@@ -165,6 +181,13 @@ fun MainPage(
                 ) { backStackEntry ->
                     val doorGuid = backStackEntry.arguments?.getString("doorGuid")
                     DoorDetail(doorGuid = doorGuid!!, mainPageNavController)
+                }
+                composable(
+                    route = "temp_humi_detail/{deviceNo}",
+                    arguments = listOf(navArgument("deviceNo") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val deviceNo = backStackEntry.arguments?.getString("deviceNo")
+                    TempHumiDetail(deviceNo = deviceNo!!)
                 }
                 composable(
                     route = "vr"

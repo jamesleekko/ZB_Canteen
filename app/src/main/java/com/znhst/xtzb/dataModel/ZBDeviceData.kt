@@ -25,6 +25,11 @@ data class SmokeAlarmInfo(
     val deviceAlias: String,
 )
 
+data class TempHumiInfo(
+    val deviceNo: String,
+    val deviceAlias: String,
+)
+
 data class DoorInfo(
     val doorSN: String,
     val doorGuid: String,
@@ -32,3 +37,10 @@ data class DoorInfo(
     val doorStatus: Int,
     val lineWay: String,
 )
+
+enum class TempHumiCategory(val value: String) {
+    LAB("lab"),
+    CANTEEN("canteen");
+
+    override fun toString(): String = value
+}

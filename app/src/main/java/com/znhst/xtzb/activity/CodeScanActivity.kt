@@ -123,7 +123,7 @@ fun CodeScanScreen() {
                 verticalArrangement = Arrangement.Center
             ) {
 //                Text(text = "Scanned QR Code: $scannedData")
-                Text("库存系统正在开发...")
+                Text("库存系统尚在开发...")
                 if (isDialogVisible && scannedData != null) {
                     ScanResultDialog(
                         scannedResult = scannedData!!,
@@ -224,7 +224,7 @@ fun ScanResultDialog(scannedResult: String, onDismiss: () -> Unit) {
             Column {
                 Text(text = scannedResult)
                 Spacer(Modifier.height(54.dp))
-                Text(text = "库存系统正在开发...")
+                Text(text = "库存系统尚在开发...")
             }
         }
     )

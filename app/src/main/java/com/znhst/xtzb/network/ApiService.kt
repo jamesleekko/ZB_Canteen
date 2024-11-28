@@ -6,12 +6,19 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.znhst.xtzb.BuildConfig
+import com.znhst.xtzb.dataModel.StockCategory
 import com.znhst.xtzb.dataModel.DoorInfo
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo
 import com.znhst.xtzb.dataModel.EZNewsCategory
 import com.znhst.xtzb.dataModel.FreezerInfo
 import com.znhst.xtzb.dataModel.SmokeAlarmInfo
+import com.znhst.xtzb.dataModel.Stock
+import com.znhst.xtzb.dataModel.StockInboundRecord
+import com.znhst.xtzb.dataModel.StockItem
+import com.znhst.xtzb.dataModel.StockOutboundRecord
+import com.znhst.xtzb.dataModel.TempHumiInfo
+import com.znhst.xtzb.dataModel.TempHumiCategory
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -104,25 +111,6 @@ data class CaptchaResponse(
     @Json(name = "uuid") val uuid: String
 )
 
-data class AACTransferStatusData(
-    @Json(name = "enable") val enable: Boolean
-)
-
-data class AACTransferStatusMeta(
-    @Json(name = "code") val code: Int,
-    @Json(name = "message") val message: String,
-    @Json(name = "moreInfo") val moreInfo: Any?
-)
-
-data class AACTransferStatusResponse(
-    @Json(name = "data") val data: AACTransferStatusData,
-    @Json(name = "meta") val meta: AACTransferStatusMeta,
-)
-
-data class AACSettingStatusResponse(
-    @Json(name = "meta") val meta: AACTransferStatusMeta,
-)
-
 data class DayufengResponse<T>(
     @Json(name = "data") val data: T?,
     @Json(name = "code") val code: Int,
@@ -187,6 +175,19 @@ data class DoorOperationEntry(
     @Json(name = "remark") val remark: String,
 )
 
+data class TempHumiEntry(
+    @Json(name = "shebeibianhao") val deviceNo: String,
+    @Json(name = "time") val time : String,
+    @Json(name = "temperature01") val temp: String,
+    @Json(name = "humidity") val humi: String,
+    @Json(name = "xinhao") val signal: String,
+    @Json(name = "jingdu") val longitude: String,
+    @Json(name = "weidu") val latitude: String,
+    @Json(name = "coordinate_type") val coordinateType: Int,
+    @Json(name = "power") val power: String,
+    @Json(name = "id") val id: Int
+)
+
 interface ApiService {
 
     @POST("/api/users/register")
@@ -241,6 +242,10 @@ interface ApiService {
     @Headers("Content-Type: application/json")
     suspend fun getDayufengDoors(): List<DoorInfo>
 
+    @GET("/dayufeng/temp_humi_list")
+    @Headers("Content-Type: application/json")
+    suspend fun getTempHumis(@Query("category") category: TempHumiCategory): List<TempHumiInfo>
+
     @GET("/devices_data_v2")
     @Headers("Content-Type: application/json")
     suspend fun getFreezerHistory(
@@ -265,6 +270,18 @@ interface ApiService {
         @Query("endTime", encoded = true) endTime: String
     ): DayufengResponse<DayufengData<DayufengHistoryData<SmokeAlarmEntry>>>
 
+    @GET("/devices_data_v2")
+    @Headers("Content-Type: application/json")
+    suspend fun getTempHumiHistory(
+        @Header("Authorization") token: String,
+        @Query("login_type") loginType: String,
+        @Query("shebeibianhao") deviceNo: String,
+        @Query("page") page: String,
+        @Query("limit") limit: String,
+        @Query("startTime", encoded = true) startTime: String,
+        @Query("endTime", encoded = true) endTime: String,
+    ): DayufengResponse<DayufengData<DayufengHistoryData<TempHumiEntry>>>
+
     @GET("/door_log_list")
     @Headers("Content-Type: application/json")
     suspend fun getDoorHistory(
@@ -284,6 +301,22 @@ interface ApiService {
     @POST("/news/news_list")
     @Headers("Content-Type: application/json")
     suspend fun getNewsList(@Body request: NewsListRequest): NewsListResponse
+
+    @GET("/stock/items")
+    @Headers("Content-Type: application/json")
+    suspend fun getStockItems(): List<StockItem>
+
+    @GET("/stock/stocks")
+    @Headers("Content-Type: application/json")
+    suspend fun getStocks(): List<Stock>
+
+    @POST("/stock/inbound")
+    @Headers("Content-Type: application/json")
+    suspend fun addInboundRecord(@Body inboundRecord: StockInboundRecord): Response<Void>
+
+    @POST("/stock/outbound")
+    @Headers("Content-Type: application/json")
+    suspend fun addOutboundRecord(@Body outboundRecord: StockOutboundRecord): Response<Void>
 }
 
 object ApiClient {
@@ -308,7 +341,6 @@ object ApiClient {
 
         retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
-//            .baseUrl("http://192.168.1.6:8000")
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .client(client)
             .build()

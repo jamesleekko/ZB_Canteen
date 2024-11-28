@@ -1,6 +1,7 @@
 package com.znhst.xtzb.ui.page
 
 import android.content.Intent
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +38,7 @@ import androidx.navigation.NavController
 import com.znhst.xtzb.R
 import com.znhst.xtzb.activity.VRActivity
 import com.znhst.xtzb.dataModel.EZDeviceCategory
+import com.znhst.xtzb.dataModel.TempHumiCategory
 import com.znhst.xtzb.viewModel.DeviceViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -109,8 +111,15 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController)
                 navController.navigate("smoke_alarm_list")
             }
 
+            6 -> {
+                navController.navigate("stock")
+            }
+
+            11 -> {
+                navController.navigate("temp_humi_list/${TempHumiCategory.LAB.name}")
+            }
+
             12 -> {
-//                navController.navigate("vr")
                 val intent = Intent(context, VRActivity::class.java)
                 context.startActivity(intent)
             }
