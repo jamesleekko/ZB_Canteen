@@ -6,6 +6,9 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -15,8 +18,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -69,10 +75,36 @@ fun MainPage(
     val mainPageNavController = rememberNavController()
     var selectedItem by remember { mutableIntStateOf(0) }
 
+    var canNavigateBack by remember { mutableStateOf(false) }
+    var currentRoute by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(mainPageNavController) {
+        mainPageNavController.currentBackStackEntryFlow.collect { backStackEntry ->
+            currentRoute = backStackEntry.destination.route
+            canNavigateBack =
+                mainPageNavController.previousBackStackEntry != null && currentRoute != "news" && currentRoute != "device_category" && currentRoute != "profile"
+        }
+    }
+
     Scaffold(
         topBar = {
+            val navigationIcon: (@Composable () -> Unit) = run {
+                {
+                    if (canNavigateBack) {
+                        IconButton(onClick = {
+                            mainPageNavController.popBackStack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "返回",
+                                tint = Color.Black
+                            )
+                        }
+                    }
+                }
+            }
             TopAppBar(
                 title = { Text(text = "智能化食堂") },
+                navigationIcon = navigationIcon,
                 actions = {
                     IconButton(onClick = {
                         val intent = Intent(context, CodeScanActivity::class.java)

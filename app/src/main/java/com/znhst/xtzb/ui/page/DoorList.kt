@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -50,23 +49,23 @@ fun DoorList(deviceViewModel: DeviceViewModel = viewModel(), navController: NavC
     }
 
     Box {
-        Box(Modifier.offset(y = (-4).dp)) {
-            IconButton(
-                onClick = {navController.popBackStack()},
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "退出",
-                    tint = Color.Black
-                )
-            }
-        }
+//        Box(Modifier.offset(y = (-4).dp)) {
+//            IconButton(
+//                onClick = {navController.popBackStack()},
+//                modifier = Modifier
+//                    .align(Alignment.TopStart)
+//                    .padding(16.dp)
+//                    .size(36.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "退出",
+//                    tint = Color.Black
+//                )
+//            }
+//        }
 
-        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 56.dp)) {
+        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
             items(doorList) { door ->
                 Card(modifier = Modifier.fillMaxWidth(),
                     onClick = {

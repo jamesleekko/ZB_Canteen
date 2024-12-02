@@ -50,23 +50,23 @@ fun FreezerList(deviceViewModel: DeviceViewModel = viewModel(), navController: N
     }
 
     Box {
-        Box(Modifier.offset(y = (-4).dp)) {
-            IconButton(
-                onClick = {navController.popBackStack()},
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "退出",
-                    tint = Color.Black
-                )
-            }
-        }
+//        Box(Modifier.offset(y = (-4).dp)) {
+//            IconButton(
+//                onClick = {navController.popBackStack()},
+//                modifier = Modifier
+//                    .align(Alignment.TopStart)
+//                    .padding(16.dp)
+//                    .size(36.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "退出",
+//                    tint = Color.Black
+//                )
+//            }
+//        }
 
-        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 56.dp)) {
+        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
             items(deviceList) { device ->
                 Card(modifier = Modifier.fillMaxWidth(),
                     onClick = {

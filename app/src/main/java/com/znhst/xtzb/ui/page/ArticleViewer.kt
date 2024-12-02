@@ -18,8 +18,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -219,13 +222,11 @@ fun VideoViewer(fileName: String, onExit: () -> Unit) {
         )
 
         // 左上角的退出按钮
-        IconButton(
+        SmallFloatingActionButton(
             onClick = onExit,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(16.dp)
-                .size(36.dp)
-                .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+                .padding(start = 16.dp, top = 32.dp)
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,

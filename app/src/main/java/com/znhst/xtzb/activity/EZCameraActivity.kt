@@ -6,7 +6,6 @@ import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -19,7 +18,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -28,7 +26,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -249,31 +246,30 @@ fun CameraScreen(
             }, modifier = Modifier.fillMaxSize()
         )
 
-//        SmallFloatingActionButton(
-//            onClick = {(context as? Activity)?.finish()},
-//            containerColor = MaterialTheme.colorScheme.primary,
-//            contentColor = MaterialTheme.colorScheme.secondary,
-//            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
-//        ) {
-//            Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
-//        }
-
-        Box() {
-            IconButton(
-                onClick = {(context as? Activity)?.finish()},
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-                    .size(36.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "退出",
-                    tint = Color.White
-                )
-            }
+        SmallFloatingActionButton(
+            onClick = {(context as? Activity)?.finish()},
+            containerColor = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
+        ) {
+            Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
         }
+
+//        Box() {
+//            IconButton(
+//                onClick = {(context as? Activity)?.finish()},
+//                modifier = Modifier
+//                    .align(Alignment.TopStart)
+//                    .padding(16.dp)
+//                    .size(36.dp)
+//                    .background(Color.Black.copy(alpha = 0.5f), shape = CircleShape)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "退出",
+//                    tint = Color.White
+//                )
+//            }
+//        }
     }
 
     Column(

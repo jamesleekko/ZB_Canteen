@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.znhst.xtzb.viewModel.TempHumiViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.znhst.xtzb.dataModel.TempHumiCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

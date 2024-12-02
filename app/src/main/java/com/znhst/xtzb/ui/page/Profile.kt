@@ -72,42 +72,39 @@ fun UserInfo(viewModel: ProfileViewModel) {
         "${BuildConfig.BASE_URL}/avatar/${userInfo.avatarName}"
     }
 
-    ZoomableBox {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-            Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-            // 头像显示 - 方形圆角
-            AsyncImage(
-                model = avatarUrl,
-                contentDescription = "头像",
+        // 头像显示 - 方形圆角
+        AsyncImage(
+            model = avatarUrl,
+            contentDescription = "头像",
+            modifier = Modifier
+                .size(120.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
+        )
+
+        Spacer(Modifier.height(24.dp))
+
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            // 用户信息
+            Column(
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
-            )
-
-            Spacer(Modifier.height(24.dp))
-
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                // 用户信息
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                ) {
-                    UserInfoRow(label = "登录账号", value = userInfo.userName, showDivider = true)
-                    UserInfoRow(label = "用户昵称", value = userInfo.nickName, showDivider = true)
-                    UserInfoRow(label = "所属部门", value = userInfo.dept.name, showDivider = true)
-                    UserInfoRow(label = "手机号码", value = userInfo.phone, showDivider = false)
-                }
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+            ) {
+                UserInfoRow(label = "登录账号", value = userInfo.userName, showDivider = true)
+                UserInfoRow(label = "用户昵称", value = userInfo.nickName, showDivider = true)
+                UserInfoRow(label = "所属园区", value = userInfo.dept.name, showDivider = true)
+                UserInfoRow(label = "手机号码", value = userInfo.phone, showDivider = false)
             }
-
-//        DisplayColorScheme()
         }
+
     }
 }
 

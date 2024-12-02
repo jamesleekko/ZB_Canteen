@@ -44,23 +44,23 @@ fun StockScreen(viewModel: StockViewModel = viewModel(), navController: NavContr
     }
 
     Box{
-        Box(Modifier.offset(y = (-4).dp)) {
-            IconButton(
-                onClick = {navController.popBackStack()},
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "退出",
-                    tint = Color.Black
-                )
-            }
-        }
+//        Box(Modifier.offset(y = (-4).dp)) {
+//            IconButton(
+//                onClick = {navController.popBackStack()},
+//                modifier = Modifier
+//                    .align(Alignment.TopStart)
+//                    .padding(16.dp)
+//                    .size(36.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "退出",
+//                    tint = Color.Black
+//                )
+//            }
+//        }
 
-        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 56.dp)) {
+        Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
             LazyColumn {
                 items(stocks) { item ->
                     StockRow(item)

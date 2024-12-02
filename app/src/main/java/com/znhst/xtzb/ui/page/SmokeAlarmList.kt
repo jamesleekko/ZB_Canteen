@@ -1,7 +1,6 @@
 package com.znhst.xtzb.ui.page
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -51,23 +49,23 @@ fun SmokeAlarmList(deviceViewModel: DeviceViewModel = viewModel(), navController
     }
 
     Box {
-        Box(Modifier.offset(y = (-4).dp)) {
-            IconButton(
-                onClick = {navController.popBackStack()},
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(16.dp)
-                    .size(36.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "退出",
-                    tint = Color.Black
-                )
-            }
-        }
+//        Box(Modifier.offset(y = (-4).dp)) {
+//            IconButton(
+//                onClick = {navController.popBackStack()},
+//                modifier = Modifier
+//                    .align(Alignment.TopStart)
+//                    .padding(16.dp)
+//                    .size(36.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.ArrowBack,
+//                    contentDescription = "退出",
+//                    tint = Color.Black
+//                )
+//            }
+//        }
 
-        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 56.dp)) {
+        LazyColumn(modifier = Modifier.padding(start = 16.dp, end = 16.dp)) {
             items(deviceList) { device ->
                 Card(modifier = Modifier.fillMaxWidth(),
                     onClick = {
