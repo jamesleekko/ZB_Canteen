@@ -114,10 +114,10 @@ fun MyMain(context: Context, tokenManager: TokenManager, viewModel: AuthViewMode
         composable("login") { AuthScreen(context, viewModel(), navController = navController) }
         composable("register") { RegisterScreen(viewModel(), navController = navController) }
         composable("main") { MainPage(outNavController = navController) }
-        composable(route = "article_viewer/{newsItem}",
-            arguments = listOf(navArgument("newsItem") {type= NavType.StringType})
-        ) {
-                backStackEntry ->
+        composable(
+            route = "article_viewer/{newsItem}",
+            arguments = listOf(navArgument("newsItem") { type = NavType.StringType })
+        ) { backStackEntry ->
             val newsItemJson = backStackEntry.arguments?.getString("newsItem")
             val newsItem = Gson().fromJson(newsItemJson, NewsItem::class.java)
             ArticleViewer(newsItem = newsItem, outNavController = navController)

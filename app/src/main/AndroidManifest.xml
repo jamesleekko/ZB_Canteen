@@ -47,8 +47,8 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.ZB_Canteen"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,6 +66,7 @@
 
         <activity
             android:name=".activity.VRActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light" />
 
         <service
