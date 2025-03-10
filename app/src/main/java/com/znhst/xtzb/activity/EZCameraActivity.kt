@@ -6,6 +6,9 @@ import android.app.Application
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -14,7 +17,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -24,7 +37,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,6 +53,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.zxing.integration.android.IntentIntegrator.REQUEST_CODE
+import com.videogo.errorlayer.ErrorInfo
 import com.videogo.openapi.EZConstants
 import com.videogo.openapi.EZOpenSDK
 import com.videogo.openapi.EZPlayer
@@ -47,6 +67,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+
 
 class EZCameraActivity : ComponentActivity() {
     private fun requestAudioPermission() {
@@ -94,7 +115,7 @@ fun CameraScreen(
     cameraSerial: String,
     cameraNo: Int,
     application: Application,
-    activity: Activity
+    activity: Activity,
 ) {
     var player by remember { mutableStateOf<EZPlayer?>(null) }
     val localInfo: LocalInfo = LocalInfo.getInstance()
@@ -116,6 +137,30 @@ fun CameraScreen(
     val context = LocalContext.current
 
     val ezViewModel = EZViewModel(application)
+
+    val mHandler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            super.handleMessage(msg)
+//            if (msg.what == EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_SUCCESS) return
+//            val errorinfo = msg.obj as ErrorInfo
+//            errorinfo.let {
+//                Toast.makeText(activity, "实时播放: ${errorinfo.errorCode}", Toast.LENGTH_SHORT)
+//                    .show()
+//            }
+//            when (msg.what) {
+//                EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_SUCCESS -> {
+//                    Toast.makeText(activity, "实时播放: 播放成功", Toast.LENGTH_SHORT)
+//                }
+//                EZConstants.EZRealPlayConstants.MSG_REALPLAY_PLAY_FAIL -> {
+//                    val errorinfo = msg.obj as ErrorInfo
+//                    val code = errorinfo.errorCode
+//                    val codeStr = errorinfo.moduleCode
+//                    val desc = errorinfo.description
+//                    Toast.makeText(activity, "实时播放: 播放失败 ${code} ${codeStr} ${desc}", Toast.LENGTH_SHORT)
+//                }
+//            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         isSoundOpen = localInfo.isSoundOpen
@@ -146,10 +191,16 @@ fun CameraScreen(
     fun startCameraPreview(holder: SurfaceHolder) {
         scope.launch {
             player = EZOpenSDK.getInstance().createPlayer(cameraSerial, cameraNo)
+            player?.setHandler(mHandler)
             player?.setSurfaceHold(holder)
-            player?.startRealPlay() // 开始播放
-            delay(2000)
-            player?.openSound()
+            try {
+                player?.startRealPlay() // 开始播放
+                delay(2000)
+                player?.openSound()
+            } catch (e: Exception) {
+                Toast.makeText(activity, "实时画面播放失败: ${e.message}", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 
@@ -169,7 +220,7 @@ fun CameraScreen(
 
     fun onClickTalk() {
         scope.launch {
-            if(!isTalking) {
+            if (!isTalking) {
                 player?.startVoiceTalk()
                 delay(2000)
                 player?.setVoiceTalkStatus(true)
@@ -246,9 +297,11 @@ fun CameraScreen(
         )
 
         SmallFloatingActionButton(
-            onClick = {(context as? Activity)?.finish()},
+            onClick = { (context as? Activity)?.finish() },
             containerColor = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.align(Alignment.TopStart).offset(x = 10.dp, y = 10.dp)
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .offset(x = 10.dp, y = 10.dp)
         ) {
             Icon(Icons.Filled.ArrowBack, "退出", tint = Color.White)
         }
