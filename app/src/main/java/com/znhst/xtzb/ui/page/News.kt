@@ -97,8 +97,8 @@ fun TopStickyHeader(
     var campusList by remember {
         mutableStateOf(
             listOf<String>(
-                "超级园区",
-                "测试园区"
+                "园区一",
+                "园区二"
             )
         )
     }

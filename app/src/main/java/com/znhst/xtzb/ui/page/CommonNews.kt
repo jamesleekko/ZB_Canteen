@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ import com.google.gson.Gson
 import com.znhst.xtzb.R
 import com.znhst.xtzb.network.NewsItem
 import com.znhst.xtzb.viewModel.NewsViewModel
+import kotlinx.coroutines.launch
 
 val colors = listOf(
     Color(0xFF5F8C6B), // Announcement
@@ -73,7 +75,7 @@ fun CommonNews(
     var selectedTabIndex by remember { mutableStateOf(0) }
 
     newsViewModel.fetchCategories()
-    LaunchedEffect(categories, selectedTabIndex) {
+    LaunchedEffect(categories) {
         if (categories.isNotEmpty()) {
             val selectedCategoryType = categories[selectedTabIndex].type
             newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
@@ -102,28 +104,28 @@ fun CommonNews(
                     .padding(horizontal = 0.dp)
                     .background(MaterialTheme.colorScheme.surface),
                 edgePadding = 0.dp,
-                indicator = {
-//                    tabPositions ->
-//                    Box(
-//                        Modifier
-//                            .tabIndicatorOffset(tabPositions[selectedTabIndex])
-//                            .height(4.dp)
-//                            .clip(RoundedCornerShape(50))
-//                            .background(colors[selectedTabIndex])
-//                    )
-                }
             ) {
                 categories.forEachIndexed { index, item ->
+                    val coroutineScope = rememberCoroutineScope()
+
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = {
-                            selectedTabIndex = index
-                            currentPage = 0
-                            newsViewModel.fetchNews(
-                                categories[selectedTabIndex].type,
-                                currentPage,
-                                pageSize
-                            )
+                            if(selectedTabIndex != index) {
+                                selectedTabIndex = index
+                                currentPage = 0
+
+                                // 先滚动到顶部
+                                coroutineScope.launch {
+                                    listState.scrollToItem(0)
+                                }
+
+                                newsViewModel.fetchNews(
+                                    categories[selectedTabIndex].type,
+                                    currentPage,
+                                    pageSize
+                                )
+                            }
                         },
                         modifier = Modifier
                             .padding(4.dp) // 添加一点内边距
