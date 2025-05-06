@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -31,6 +32,7 @@ import com.znhst.xtzb.compose.LoginTextField
 import com.znhst.xtzb.viewModel.AuthViewModel
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AuthScreen(
     context: Context,
@@ -51,6 +53,7 @@ fun AuthScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusRequester = FocusRequester()
     val focusManager = LocalFocusManager.current
+    val isImeVisible = rememberUpdatedState(WindowInsets.isImeVisible)
 
     LaunchedEffect(Unit) {
         try {
@@ -86,30 +89,33 @@ fun AuthScreen(
                     .fillMaxWidth()
 //                    .align(alignment = Alignment.TopCenter),
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(360f / 301f)
-                ) {
-                    Image(
-                        painter = painterResource(bg),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Text(
-                        text = "智能化食堂",
-                        fontSize = 32.sp,
-                        color = Color(0xE0FFFFFF),
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                    Text(
-                        text = "众搏",
-                        fontSize = 16.sp,
-                        color = Color(0xE0FFFFFF),
+                if(!isImeVisible.value) {
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .offset(y = 36.dp)
-                    )
+                            .fillMaxWidth()
+                            .aspectRatio(360f / 301f)
+//                        .aspectRatio(if (isImeVisible.value) 10000f else 360f / 301f)
+                    ) {
+                        Image(
+                            painter = painterResource(bg),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Text(
+                            text = "智能化食堂",
+                            fontSize = 32.sp,
+                            color = Color(0xE0FFFFFF),
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                        Text(
+                            text = "众搏",
+                            fontSize = 16.sp,
+                            color = Color(0xE0FFFFFF),
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .offset(y = 36.dp)
+                        )
+                    }
                 }
 
                 Column(
@@ -117,7 +123,7 @@ fun AuthScreen(
                         .fillMaxWidth()
                         .padding(commonPadding)
                 ) {
-                    Spacer(Modifier.height(30.dp))
+//                    Spacer(Modifier.height(30.dp))
 
                     LoginTextField(
                         value = username,
@@ -125,7 +131,7 @@ fun AuthScreen(
                         placeholder = "用户名"
                     )
 
-                    Spacer(modifier = Modifier.height(46.dp))
+                    Spacer(modifier = Modifier.height(commonPadding))
 
                     LoginTextField(
                         value = password,
@@ -134,7 +140,7 @@ fun AuthScreen(
                         isPassword = true,
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(commonPadding))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Base64Image(
@@ -150,8 +156,6 @@ fun AuthScreen(
                         )
                     }
                 }
-
-
             }
 
             Column(
