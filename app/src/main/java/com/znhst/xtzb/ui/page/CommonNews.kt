@@ -1,5 +1,6 @@
 package com.znhst.xtzb.ui.page
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,9 +75,13 @@ fun CommonNews(
 
     var selectedTabIndex by remember { mutableStateOf(0) }
 
-    newsViewModel.fetchCategories()
+    LaunchedEffect(Unit) {
+        newsViewModel.fetchCategories()
+    }
     LaunchedEffect(categories) {
         if (categories.isNotEmpty()) {
+            // 清空当前新闻列表
+            newsViewModel.clearNewsList()
             val selectedCategoryType = categories[selectedTabIndex].type
             newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
         }

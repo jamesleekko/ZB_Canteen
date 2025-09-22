@@ -39,6 +39,12 @@ class NewsViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun clearNewsList() {
+        _currentNewsList.value = emptyList()
+        _currentTotal.value = 0
+        lastFetchedType = null
+    }
+
     fun fetchNews(type: Int?, page: Int? = 0, pageSize: Int? = 10) {
         viewModelScope.launch {
             try {
