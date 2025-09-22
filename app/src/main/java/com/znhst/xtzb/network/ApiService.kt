@@ -6,7 +6,6 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.znhst.xtzb.BuildConfig
-import com.znhst.xtzb.dataModel.StockCategory
 import com.znhst.xtzb.dataModel.DoorInfo
 import com.znhst.xtzb.dataModel.EZDeviceCategory
 import com.znhst.xtzb.dataModel.EZDeviceInfo

@@ -98,11 +98,15 @@ fun MyMain(context: Context, tokenManager: TokenManager, viewModel: AuthViewMode
     val navController = rememberNavController()
 
     val hasToken = remember { TokenManager(context).getToken() != null }
+    Log.d("has token", TokenManager(context).getToken()?:"token none")
 
     val logout: () -> Unit = {
         viewModel.logout {
-            navController.navigate("login") {
-                popUpTo("main") { inclusive = true } // 清空返回栈
+            val currentDestination = navController.currentDestination
+            if(currentDestination?.route != "login") {
+                navController.navigate("login") {
+                    popUpTo("main") { inclusive = true } // 清空返回栈
+                }
             }
         }
     }

@@ -26,6 +26,10 @@ class ErrorInterceptor(private val context: Context,private val logout:() -> Uni
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
+        Log.d("请求path:", request.url.encodedPath)
+        if (request.url.encodedPath == "/auth/logout") {
+            return chain.proceed(request)
+        }
         val response = chain.proceed(request)
 
         Log.d("response info", response.toString())
@@ -37,13 +41,14 @@ class ErrorInterceptor(private val context: Context,private val logout:() -> Uni
                 try {
                     errorAdapter.fromJson(responseString)
                 } catch (e: Exception) {
-                    Log.e("ErrorInterceptor", "解析结构体失败", e)
+                    Log.e("ErrorInterceptor", "接口错误: ", e)
+                    logout()
                     null
                 }
             }
 
             errorResponse?.let {
-                Log.d("response error", "Code: ${it.status}, Message: ${it.message}")
+                Log.d("错误详细: ", "Code: ${it.status}, Message: ${it.message}")
                 showApiErrorToast(context, it.message?: "未知错误")
 
                 // 处理 401 错误

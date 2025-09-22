@@ -14,7 +14,8 @@ class TokenInterceptor(private val tokenManager: TokenManager, private val conte
 
         // 如果 token 不为空，添加到请求头
         token?.let {
-            requestBuilder.addHeader("Authorization", it.toString())
+            requestBuilder.addHeader("Authorization", it)
+//            requestBuilder.addHeader("Authorization", "123321") //debug
         }
 
         val response = chain.proceed(requestBuilder.build())

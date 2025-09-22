@@ -161,8 +161,11 @@ fun DisplayColorScheme() {
 
 fun logout(viewModel: AuthViewModel, navController: NavController) {
     viewModel.logout {
-        navController.navigate("login") {
-            popUpTo("main") { inclusive = true }
+        val currentDestination = navController.currentDestination
+        if(currentDestination?.route != "login") {
+            navController.navigate("login") {
+                popUpTo("main") { inclusive = true } // 清空返回栈
+            }
         }
     }
 }

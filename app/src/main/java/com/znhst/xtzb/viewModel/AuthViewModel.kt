@@ -66,15 +66,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun logout(onSuccess: () -> Unit) {
+    fun logout(callback: () -> Unit) {
         viewModelScope.launch {
             try {
                 ApiClient.apiService.logout()
-                tokenManager.clearToken()
-                onSuccess()
                 Log.d("注销成功","123")
             } catch (e: HttpException) {
                 Log.d("注销失败",e.message())
+            } catch (apiError: ApiException){
+                Log.d("注销失败api", apiError.message.toString())
+            } finally {
+                tokenManager.clearToken()
+                callback()
             }
         }
     }
