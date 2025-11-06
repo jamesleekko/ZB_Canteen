@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ fun DoorDetail(
     viewModel: DoorViewModel = viewModel()
 ) {
     val historyList by viewModel.historyList.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     // 获取历史记录
     LaunchedEffect(Unit) {
@@ -67,12 +69,31 @@ fun DoorDetail(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 历史记录列表
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            itemsIndexed(historyList) { index, item ->
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        } else if (historyList.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "暂无数据",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                )
+            }
+        } else {
+            // 历史记录列表
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                itemsIndexed(historyList) { index, item ->
                 // 单个记录卡片
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -113,6 +134,7 @@ fun DoorDetail(
                         )
                     }
                 }
+            }
             }
         }
 

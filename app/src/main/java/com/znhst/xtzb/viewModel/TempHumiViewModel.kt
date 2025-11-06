@@ -20,12 +20,16 @@ class TempHumiViewModel(application: Application) : AndroidViewModel(application
     private val _historyList = MutableStateFlow<List<TempHumiEntry>>(emptyList())
     val historyList: StateFlow<List<TempHumiEntry>> = _historyList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun fetchHistory(deviceNo: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 // 获取当前时间
                 val now = LocalDateTime.now()
@@ -54,6 +58,8 @@ class TempHumiViewModel(application: Application) : AndroidViewModel(application
             } catch (e: Exception) {
                 Log.d("Error fetching temp&humi history:", "${e.message}")
                 _errorMessage.value = "Error fetching temp&humi history: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }

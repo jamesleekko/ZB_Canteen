@@ -44,13 +44,14 @@ import kotlinx.coroutines.withContext
 @Composable
 fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewModel()) {
     val historyList by viewModel.historyList.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
     val alarmImgId = R.drawable.detector_alarm
     val normalImgId = R.drawable.detector_fine
 
     // 获取最新状态
-    val isLoading = historyList.isEmpty()
-    val latestStatus = historyList.firstOrNull()?.doorStatus ?: "未知"
-    val isNormal = latestStatus == "正常"
+    val latestStatus = historyList.firstOrNull()?.doorStatus
+    // 当无数据时，默认显示为正常状态
+    val isNormal = latestStatus?.let { it == "正常" } ?: true
 
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
@@ -95,7 +96,11 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
                             color = if (isNormal) Color(0xFF388E3C) else Color(0xFFD32F2F)
                         )
                         Text(
-                            text = if (isNormal) "设备正常运行" else "警报触发",
+                            text = when {
+                                latestStatus == null -> "设备正常运行"
+                                isNormal -> "设备正常运行"
+                                else -> "警报触发"
+                            },
                             fontSize = 16.sp,
                             color = Color.Gray
                         )
@@ -119,12 +124,29 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
 
         if(!isLoading) {
             Text(text = "历史记录", style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            if (historyList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "暂无数据",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Gray
+                    )
+                }
+            }
         }
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsIndexed(historyList) { index, item ->
+        
+        if (!isLoading && historyList.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                itemsIndexed(historyList) { index, item ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -174,5 +196,5 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
                 }
             }
         }
-    }
+    }}
 }

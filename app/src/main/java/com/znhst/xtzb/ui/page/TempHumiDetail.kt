@@ -38,7 +38,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun TempHumiDetail(deviceNo: String, viewModel: TempHumiViewModel = viewModel()) {
     val historyList by viewModel.historyList.collectAsState()
-    val isLoading = historyList.isEmpty()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     // 获取最新记录
     val latestEntry = historyList.firstOrNull()
@@ -128,12 +128,29 @@ fun TempHumiDetail(deviceNo: String, viewModel: TempHumiViewModel = viewModel())
 
         if (!isLoading) {
             Text(text = "历史记录", style = MaterialTheme.typography.bodyLarge)
-            Spacer(Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            if (historyList.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "暂无数据",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = Color.Gray
+                    )
+                }
+            }
         }
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            itemsIndexed(historyList) { index, item ->
+        
+        if (!isLoading && historyList.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                itemsIndexed(historyList) { index, item ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -173,6 +190,7 @@ fun TempHumiDetail(deviceNo: String, viewModel: TempHumiViewModel = viewModel())
                         color = Color.LightGray
                     )
                 }
+            }
             }
         }
     }

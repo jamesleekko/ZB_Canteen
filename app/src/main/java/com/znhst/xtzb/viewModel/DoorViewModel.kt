@@ -17,12 +17,16 @@ class DoorViewModel(application: Application) : AndroidViewModel(application) {
     private val _historyList = MutableStateFlow<List<DoorOperationEntry>>(emptyList())
     val historyList: StateFlow<List<DoorOperationEntry>> = _historyList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun fetchHistory(doorGuid: String, page:Int = 1, limit:Int = 100, startTime: String?, endTime: String?) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 val dayufengToken = ApiClient.apiService.getDayufengToken()
                 val result = ApiClient.dayufengApiService.getDoorHistory(
@@ -39,6 +43,8 @@ class DoorViewModel(application: Application) : AndroidViewModel(application) {
             } catch (e: Exception) {
                 Log.d("Error fetching door history:", "${e.message}")
                 _errorMessage.value = "Error fetching door history: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }

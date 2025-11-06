@@ -20,12 +20,16 @@ class SmokeAlarmViewModel(application: Application) : AndroidViewModel(applicati
     private val _historyList = MutableStateFlow<List<SmokeAlarmEntry>>(emptyList())
     val historyList: StateFlow<List<SmokeAlarmEntry>> = _historyList
 
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun fetchHistory(deviceNo: String) {
         viewModelScope.launch {
+            _isLoading.value = true
             try {
                 // 获取当前时间
                 val now = LocalDateTime.now()
@@ -54,6 +58,8 @@ class SmokeAlarmViewModel(application: Application) : AndroidViewModel(applicati
             } catch (e: Exception) {
                 Log.d("Error fetching freezer history:", "${e.message}")
                 _errorMessage.value = "Error fetching freezer history: ${e.message}"
+            } finally {
+                _isLoading.value = false
             }
         }
     }
