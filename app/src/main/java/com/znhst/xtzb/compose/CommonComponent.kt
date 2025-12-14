@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldDecorator
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
@@ -53,7 +54,11 @@ import androidx.core.content.contentValuesOf
 import java.io.ByteArrayInputStream
 
 @Composable
-fun Base64Image(base64String: String, modifier: Modifier) {
+fun Base64Image(
+    base64String: String,
+    modifier: Modifier,
+    contentScale: ContentScale = ContentScale.Fit
+) {
     // 去除前缀 "data:image/png;base64,"
     val cleanBase64String = base64String.substringAfter("base64,")
 
@@ -69,7 +74,8 @@ fun Base64Image(base64String: String, modifier: Modifier) {
             Image(
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = null, // 可以提供描述文字
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentScale = contentScale
             )
         } else {
             Box(

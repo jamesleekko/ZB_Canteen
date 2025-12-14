@@ -15,8 +15,8 @@ android {
         applicationId = "com.znhst.xtzb"
         minSdk = 24
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.1"
+        versionCode = 3
+        versionName = "1.2"
 
         buildConfigField("String", "EZ_URL", "\"https://open.ys7.com\"")
         buildConfigField("String", "DYF_URL", "\"https://api.dayufeng.cn\"")
