@@ -38,9 +38,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.znhst.xtzb.network.DoorOperationEntry
 import com.znhst.xtzb.viewModel.DoorViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 val openWayMap: Map<Int, String> = mapOf(
     1 to "二维码",
@@ -61,6 +64,12 @@ fun DoorDetail(
     val historyList by viewModel.historyList.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    val displayList = if (!isLoading && historyList.isEmpty()) {
+        mockDoorHistory(doorGuid)
+    } else {
+        historyList
+    }
+
     // 获取历史记录
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
@@ -76,24 +85,26 @@ fun DoorDetail(
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
-        } else if (historyList.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "暂无数据",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-        } else {
+        } 
+        // else if (historyList.isEmpty()) {
+        //     Box(
+        //         modifier = Modifier.fillMaxSize(),
+        //         contentAlignment = Alignment.Center
+        //     ) {
+        //         Text(
+        //             text = "暂无数据",
+        //             style = MaterialTheme.typography.bodyLarge,
+        //             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        //         )
+        //     }
+        // }
+         else {
             // 历史记录列表
             LazyColumn(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                itemsIndexed(historyList) { index, item ->
+                itemsIndexed(displayList) { index, item ->
                 // 单个记录卡片
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -155,5 +166,29 @@ fun DoorDetail(
 //                tint = Color.White
 //            )
 //        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun mockDoorHistory(doorGuid: String): List<DoorOperationEntry> {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val now = LocalDateTime.now()
+    val openWays = listOf(1, 2, 3, 4, 5, 9)
+    val names = listOf("admin001", "admin002", "admin003", "admin004", "admin005", "admin006")
+    val remarks = listOf("测试数据")
+
+    return List(20) { idx ->
+        val t = now.minusMinutes((idx * 7L) + 3L)
+        DoorOperationEntry(
+            logSn = "mock-${idx + 1}",
+            doorGuid = doorGuid,
+            doorName = "门禁-${doorGuid.take(6)}",
+            memberXm = names[idx % names.size],
+            visitTime = t.format(formatter),
+            imgUrl = null,
+            openWay = openWays[idx % openWays.size],
+            openStatus = if (idx % 6 == 0) 2 else 1,
+            remark = remarks[idx % remarks.size]
+        )
     }
 }

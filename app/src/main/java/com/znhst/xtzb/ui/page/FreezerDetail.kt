@@ -32,9 +32,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.znhst.xtzb.R
+import com.znhst.xtzb.network.FreezerEntry
 import com.znhst.xtzb.viewModel.FreezerDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -43,6 +46,12 @@ fun FreezerDetail(deviceNo: String, viewModel: FreezerDetailViewModel = viewMode
     val isLoading by viewModel.isLoading.collectAsState()
     val openDoorImgId = R.drawable.door_open
     val closeDoorImgId = R.drawable.door_close
+
+    val displayList = if (!isLoading && historyList.isEmpty()) {
+        mockFreezerHistory(deviceNo)
+    } else {
+        historyList
+    }
 
     // 数据加载
     LaunchedEffect(Unit) {
@@ -59,24 +68,26 @@ fun FreezerDetail(deviceNo: String, viewModel: FreezerDetailViewModel = viewMode
             ) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
-        } else if (historyList.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "暂无数据",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                )
-            }
-        } else {
+        }
+        // else if (historyList.isEmpty()) {
+        //     Box(
+        //         modifier = Modifier.fillMaxSize(),
+        //         contentAlignment = Alignment.Center
+        //     ) {
+        //         Text(
+        //             text = "暂无数据",
+        //             style = MaterialTheme.typography.bodyLarge,
+        //             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+        //         )
+        //     }
+        // }
+        else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                itemsIndexed(historyList) { index, item ->
+                itemsIndexed(displayList) { index, item ->
             // 用 Card 包裹每条记录
             androidx.compose.material3.Card(
                 modifier = Modifier
@@ -127,11 +138,34 @@ fun FreezerDetail(deviceNo: String, viewModel: FreezerDetailViewModel = viewMode
             }
 
             // 列表分隔线
-            if (index < historyList.size - 1) {
+            if (index < displayList.size - 1) {
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
             }
         }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun mockFreezerHistory(deviceNo: String): List<FreezerEntry> {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val now = LocalDateTime.now()
+    val statuses = listOf("开门", "关门")
+
+    return List(20) { idx ->
+        val t = now.minusMinutes((idx * 9L) + 2L)
+        FreezerEntry(
+            deviceNo = deviceNo,
+            time = t.format(formatter),
+            doorStatus = statuses[idx % statuses.size],
+            signalStrength = "${90 - (idx % 10)}",
+            address = "实验室冷柜区",
+            power = "${95 - (idx % 7)}",
+            longitude = "112.0000",
+            latitude = "28.0000",
+            coordinateType = 0,
+            id = idx + 1
+        )
     }
 }

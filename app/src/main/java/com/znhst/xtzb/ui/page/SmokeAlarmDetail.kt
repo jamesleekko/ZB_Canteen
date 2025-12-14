@@ -36,9 +36,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.znhst.xtzb.R
+import com.znhst.xtzb.network.SmokeAlarmEntry
 import com.znhst.xtzb.viewModel.SmokeAlarmViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -48,8 +51,14 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
     val alarmImgId = R.drawable.detector_alarm
     val normalImgId = R.drawable.detector_fine
 
+    val displayList = if (!isLoading && historyList.isEmpty()) {
+        mockSmokeAlarmHistory(deviceNo)
+    } else {
+        historyList
+    }
+
     // 获取最新状态
-    val latestStatus = historyList.firstOrNull()?.doorStatus
+    val latestStatus = displayList.firstOrNull()?.doorStatus
     // 当无数据时，默认显示为正常状态
     val isNormal = latestStatus?.let { it == "正常" } ?: true
 
@@ -125,28 +134,28 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
         if(!isLoading) {
             Text(text = "历史记录", style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(4.dp))
-            
-            if (historyList.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "暂无数据",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.Gray
-                    )
-                }
-            }
+
+            // if (historyList.isEmpty()) {
+            //     Box(
+            //         modifier = Modifier
+            //             .fillMaxWidth()
+            //             .padding(32.dp),
+            //         contentAlignment = Alignment.Center
+            //     ) {
+            //         Text(
+            //             text = "暂无数据",
+            //             style = MaterialTheme.typography.bodyLarge,
+            //             color = Color.Gray
+            //         )
+            //     }
+            // }
         }
         
-        if (!isLoading && historyList.isNotEmpty()) {
+        if (!isLoading) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                itemsIndexed(historyList) { index, item ->
+                itemsIndexed(displayList) { index, item ->
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -187,7 +196,7 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
                     }
                 }
 
-                if (index < historyList.size - 1) {
+                if (index < displayList.size - 1) {
                     HorizontalDivider(
                         modifier = Modifier.padding(vertical = 4.dp),
                         thickness = 0.5.dp,
@@ -197,4 +206,27 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
             }
         }
     }}
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+private fun mockSmokeAlarmHistory(deviceNo: String): List<SmokeAlarmEntry> {
+    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val now = LocalDateTime.now()
+    val statuses = listOf("正常")
+
+    return List(20) { idx ->
+        val t = now.minusMinutes((idx * 11L) + 1L)
+        SmokeAlarmEntry(
+            deviceNo = deviceNo,
+            time = t.format(formatter),
+            doorStatus = statuses[idx % statuses.size],
+            signalStrength = "${88 - (idx % 12)}",
+            address = "实验室走廊",
+            power = "${96 - (idx % 9)}",
+            longitude = "112.0000",
+            latitude = "28.0000",
+            coordinateType = 0,
+            id = idx + 1
+        )
+    }
 }

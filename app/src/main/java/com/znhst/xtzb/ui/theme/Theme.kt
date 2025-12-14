@@ -52,7 +52,7 @@ fun ZB_CanteenTheme(
     }
 
     MaterialTheme(
-        colorScheme = LightColorScheme,
+        colorScheme = colorScheme,
         typography = Typography,
         content = content
     )
