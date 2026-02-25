@@ -185,7 +185,7 @@ fun TopStickyHeader(
                         OutlinedTextFieldDefaults.DecorationBox(
                             value = searchQuery,
                             placeholder = {
-                                Text("选择园区", fontSize = 12.sp)
+                                Text("选择园区", fontSize = 14.sp)
                             },
                             innerTextField = innerTextField,
                             enabled = true,
@@ -193,18 +193,13 @@ fun TopStickyHeader(
                             visualTransformation = VisualTransformation.None,
                             interactionSource = remember { MutableInteractionSource() },
                             suffix = {
-                                Icon(
-                                    Icons.Filled.KeyboardArrowDown,
-                                    "选择园区",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(16.dp)
-                                )
+                                Icon(Icons.Filled.KeyboardArrowDown, "选择园区", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             },
                             contentPadding = PaddingValues(
                                 top = 0.dp,
                                 bottom = 0.dp,
-                                start = 10.dp,
-                                end = 6.dp
+                                start = 12.dp,
+                                end = 8.dp
                             )
                         )
                     }

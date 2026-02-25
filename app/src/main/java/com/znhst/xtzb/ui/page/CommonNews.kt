@@ -111,25 +111,13 @@ fun CommonNews(
         if (categories.isNotEmpty()) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
-                modifier = Modifier.fillMaxWidth(),
-                edgePadding = 12.dp,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 0.dp),
+                edgePadding = 8.dp,
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,
-                divider = {
-                    HorizontalDivider(
-                        thickness = 0.5.dp,
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
-                },
-                indicator = { tabPositions ->
-                    if (selectedTabIndex < tabPositions.size) {
-                        TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                            height = 3.dp,
-                            color = colors[selectedTabIndex % colors.size]
-                        )
-                    }
-                }
+                divider = {}
             ) {
                 categories.forEachIndexed { index, item ->
                     val coroutineScope = rememberCoroutineScope()
@@ -153,11 +141,16 @@ fun CommonNews(
                                 )
                             }
                         },
-                        modifier = Modifier.height(40.dp),
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(
+                                if (selectedTabIndex == index) tabColor else Color.Transparent
+                            ),
                         text = {
                             Text(
                                 item.displayName,
-                                color = if (selectedTabIndex == index) tabColor else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (selectedTabIndex == index) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = if(selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal,
                                 fontSize = 14.sp
                             )
