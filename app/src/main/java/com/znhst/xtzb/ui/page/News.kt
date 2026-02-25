@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -171,19 +172,20 @@ fun TopStickyHeader(
                             searchQuery = query
                         },
                         modifier = Modifier
-                            .height(40.dp)
+                            .height(32.dp)
                             .fillMaxWidth()
                             .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState ->
                                 if (!focusState.isFocused) expanded = false
                             },
+                        textStyle = MaterialTheme.typography.bodySmall,
                         singleLine = true
                     ) { innerTextField ->
                         OutlinedTextFieldDefaults.DecorationBox(
                             value = searchQuery,
                             placeholder = {
-                                Text("选择园区", fontSize = 14.sp)
+                                Text("选择园区", fontSize = 12.sp)
                             },
                             innerTextField = innerTextField,
                             enabled = true,
@@ -191,13 +193,18 @@ fun TopStickyHeader(
                             visualTransformation = VisualTransformation.None,
                             interactionSource = remember { MutableInteractionSource() },
                             suffix = {
-                                Icon(Icons.Filled.KeyboardArrowDown, "选择园区", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Icon(
+                                    Icons.Filled.KeyboardArrowDown,
+                                    "选择园区",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(16.dp)
+                                )
                             },
                             contentPadding = PaddingValues(
                                 top = 0.dp,
                                 bottom = 0.dp,
-                                start = 12.dp,
-                                end = 8.dp
+                                start = 10.dp,
+                                end = 6.dp
                             )
                         )
                     }

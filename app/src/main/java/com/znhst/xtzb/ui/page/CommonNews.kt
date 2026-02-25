@@ -22,9 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -108,13 +111,25 @@ fun CommonNews(
         if (categories.isNotEmpty()) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
-                edgePadding = 8.dp,
+                modifier = Modifier.fillMaxWidth(),
+                edgePadding = 12.dp,
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,
-                divider = {}
+                divider = {
+                    HorizontalDivider(
+                        thickness = 0.5.dp,
+                        color = MaterialTheme.colorScheme.outlineVariant
+                    )
+                },
+                indicator = { tabPositions ->
+                    if (selectedTabIndex < tabPositions.size) {
+                        TabRowDefaults.SecondaryIndicator(
+                            modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                            height = 3.dp,
+                            color = colors[selectedTabIndex % colors.size]
+                        )
+                    }
+                }
             ) {
                 categories.forEachIndexed { index, item ->
                     val coroutineScope = rememberCoroutineScope()
@@ -138,16 +153,11 @@ fun CommonNews(
                                 )
                             }
                         },
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(
-                                if (selectedTabIndex == index) tabColor else Color.Transparent
-                            ),
+                        modifier = Modifier.height(40.dp),
                         text = {
                             Text(
                                 item.displayName,
-                                color = if (selectedTabIndex == index) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (selectedTabIndex == index) tabColor else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = if(selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal,
                                 fontSize = 14.sp
                             )
