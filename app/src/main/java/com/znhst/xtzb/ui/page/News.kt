@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,7 +49,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun News(outNavController: NavController) {
     val navController = rememberNavController()
-    var currentPlate by remember { mutableStateOf("common") }
+    var currentPlate by rememberSaveable { mutableStateOf("common") }
 
     fun onClickCommon() {
         currentPlate = "common"
@@ -93,8 +94,8 @@ fun TopStickyHeader(
     onClickLocal: () -> Unit,
     onCampusSelected: (String) -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var campusList by remember {
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    var campusList by rememberSaveable {
         mutableStateOf(
             listOf<String>(
                 "园区一",
@@ -102,7 +103,7 @@ fun TopStickyHeader(
             )
         )
     }
-    var searchQuery by remember { mutableStateOf(campusList[0]) }
+    var searchQuery by rememberSaveable { mutableStateOf(campusList[0]) }
     val focusRequester = remember { FocusRequester() }
 
     Box(
