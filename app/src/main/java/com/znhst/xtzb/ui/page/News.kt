@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -171,13 +172,14 @@ fun TopStickyHeader(
                             searchQuery = query
                         },
                         modifier = Modifier
-                            .height(40.dp)
+                            .height(32.dp)
                             .fillMaxWidth()
                             .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                             .focusRequester(focusRequester)
                             .onFocusChanged { focusState ->
                                 if (!focusState.isFocused) expanded = false
                             },
+                        textStyle = MaterialTheme.typography.bodySmall,
                         singleLine = true
                     ) { innerTextField ->
                         OutlinedTextFieldDefaults.DecorationBox(
