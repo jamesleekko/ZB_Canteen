@@ -32,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
@@ -67,23 +68,25 @@ fun CommonNews(
 ) {
     val categories by newsViewModel.categoryList.collectAsState()
 
-    var currentPage by remember { mutableStateOf(0) }
-    var pageSize by remember { mutableStateOf(10) }
+    var currentPage by rememberSaveable { mutableStateOf(0) }
+    var pageSize by rememberSaveable { mutableStateOf(10) }
     val currentNewsList by newsViewModel.currentNewsList.collectAsState()
     val currentTotal by newsViewModel.currentTotal.collectAsState()
     val listState = rememberLazyListState()
 
-    var selectedTabIndex by remember { mutableStateOf(0) }
+    var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
         newsViewModel.fetchCategories()
     }
     LaunchedEffect(categories) {
         if (categories.isNotEmpty()) {
-            // 清空当前新闻列表
-            newsViewModel.clearNewsList()
-            val selectedCategoryType = categories[selectedTabIndex].type
-            newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
+            if (currentNewsList.isEmpty()) {
+                // 清空当前新闻列表
+                newsViewModel.clearNewsList()
+                val selectedCategoryType = categories[selectedTabIndex].type
+                newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
+            }
         }
     }
 
