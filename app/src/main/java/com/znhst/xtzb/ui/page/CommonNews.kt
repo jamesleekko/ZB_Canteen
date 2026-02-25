@@ -24,10 +24,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -109,53 +107,51 @@ fun CommonNews(
 
     Column(modifier = Modifier.fillMaxSize()) {
         if (categories.isNotEmpty()) {
-            ScrollableTabRow(
-                selectedTabIndex = selectedTabIndex,
+            val scrollState = rememberScrollState()
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 0.dp),
-                edgePadding = 8.dp,
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface,
-                divider = {}
+                    .horizontalScroll(scrollState)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 categories.forEachIndexed { index, item ->
                     val coroutineScope = rememberCoroutineScope()
                     val tabColor = colors[index % colors.size]
+                    val isSelected = selectedTabIndex == index
 
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        onClick = {
-                            if(selectedTabIndex != index) {
-                                selectedTabIndex = index
-                                currentPage = 0
-
-                                coroutineScope.launch {
-                                    listState.scrollToItem(0)
-                                }
-
-                                newsViewModel.fetchNews(
-                                    categories[selectedTabIndex].type,
-                                    currentPage,
-                                    pageSize
-                                )
-                            }
-                        },
+                    Box(
                         modifier = Modifier
-                            .padding(4.dp)
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(10.dp))
                             .background(
-                                if (selectedTabIndex == index) tabColor else Color.Transparent
-                            ),
-                        text = {
-                            Text(
-                                item.displayName,
-                                color = if (selectedTabIndex == index) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = if(selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal,
-                                fontSize = 14.sp
+                                if (isSelected) tabColor else Color.Transparent
                             )
-                        }
-                    )
+                            .clickable {
+                                if (selectedTabIndex != index) {
+                                    selectedTabIndex = index
+                                    currentPage = 0
+                                    coroutineScope.launch {
+                                        listState.scrollToItem(0)
+                                    }
+                                    newsViewModel.fetchNews(
+                                        categories[selectedTabIndex].type,
+                                        currentPage,
+                                        pageSize
+                                    )
+                                }
+                            }
+                            .padding(horizontal = 14.dp, vertical = 6.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = item.displayName,
+                            color = if (isSelected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                            fontSize = 14.sp
+                        )
+                    }
                 }
             }
         } else {

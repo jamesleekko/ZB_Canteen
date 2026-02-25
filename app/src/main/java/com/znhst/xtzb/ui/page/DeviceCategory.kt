@@ -60,19 +60,20 @@ val deviceTypeDrawableMap: Map<Int, Int> = mapOf(
     12 to R.drawable.device_360
 )
 
+// 中等饱和度、偏深色背景，保证白色文字/图标清晰可读，同时避免原版过于刺眼
 val deviceCardGradients: List<List<Color>> = listOf(
-    listOf(Color(0xFF667eea), Color(0xFF764ba2)),
-    listOf(Color(0xFF43e97b), Color(0xFF38f9d7)),
-    listOf(Color(0xFFfa709a), Color(0xFFfee140)),
-    listOf(Color(0xFF4facfe), Color(0xFF00f2fe)),
-    listOf(Color(0xFFa18cd1), Color(0xFFfbc2eb)),
-    listOf(Color(0xFFfccb90), Color(0xFFd57eeb)),
-    listOf(Color(0xFF667eea), Color(0xFF764ba2)),
-    listOf(Color(0xFF43e97b), Color(0xFF38f9d7)),
-    listOf(Color(0xFFfa709a), Color(0xFFfee140)),
-    listOf(Color(0xFF4facfe), Color(0xFF00f2fe)),
-    listOf(Color(0xFFa18cd1), Color(0xFFfbc2eb)),
-    listOf(Color(0xFFfccb90), Color(0xFFd57eeb)),
+    listOf(Color(0xFF6B7CB5), Color(0xFF7A6BA5)),  // 紫
+    listOf(Color(0xFF4D8A7A), Color(0xFF5A9A8A)),  // 青绿
+    listOf(Color(0xFFC88A6A), Color(0xFFD49A7A)),  // 暖橙
+    listOf(Color(0xFF4D7A9D), Color(0xFF5A8AAD)),  // 天蓝
+    listOf(Color(0xFF7A6A8D), Color(0xFF8A7A9D)),  // 薰衣草
+    listOf(Color(0xFFAA7A6A), Color(0xFFB88A7A)),  // 粉棕
+    listOf(Color(0xFF6B7CB5), Color(0xFF7A6BA5)),
+    listOf(Color(0xFF4D8A7A), Color(0xFF5A9A8A)),
+    listOf(Color(0xFFC88A6A), Color(0xFFD49A7A)),
+    listOf(Color(0xFF4D7A9D), Color(0xFF5A8AAD)),
+    listOf(Color(0xFF7A6A8D), Color(0xFF8A7A9D)),
+    listOf(Color(0xFFAA7A6A), Color(0xFFB88A7A)),
 )
 
 fun getDeviceDrawable(type: Int): Int {
@@ -129,7 +130,7 @@ fun DeviceCategoryItem(category: EZDeviceCategory, navController: NavController,
 
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp)
