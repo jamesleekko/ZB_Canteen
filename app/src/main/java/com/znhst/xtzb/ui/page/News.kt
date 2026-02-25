@@ -14,9 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
@@ -49,7 +49,7 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun News(outNavController: NavController) {
     val navController = rememberNavController()
-    var currentPlate by rememberSaveable { mutableStateOf("common") } //common | local
+    var currentPlate by rememberSaveable { mutableStateOf("common") }
 
     fun onClickCommon() {
         currentPlate = "common"
@@ -104,12 +104,12 @@ fun TopStickyHeader(
         )
     }
     var searchQuery by rememberSaveable { mutableStateOf(campusList[0]) }
-    val focusRequester = remember { FocusRequester() } // 初始化 FocusRequester
+    val focusRequester = remember { FocusRequester() }
 
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 4.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier
@@ -118,34 +118,45 @@ fun TopStickyHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(
+                FilterChip(
+                    selected = currentPlate == "common",
                     onClick = { onClickCommon() },
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.alpha(alpha = if (currentPlate == "common") 1f else 0.6f)
-                ) {
-                    Text(
-                        "公共",
-                        fontSize = 16.sp,
-                        color = if (currentPlate == "common") Color.White else Color.White,
-                        fontWeight = if (currentPlate == "common") FontWeight.Bold else FontWeight.Normal
+                    label = {
+                        Text(
+                            "公共",
+                            fontSize = 14.sp,
+                            fontWeight = if (currentPlate == "common") FontWeight.SemiBold else FontWeight.Normal
+                        )
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
+                )
                 Spacer(Modifier.width(8.dp))
-                Button(
+                FilterChip(
+                    selected = currentPlate == "local",
                     onClick = { onClickLocal() },
-                    shape = RoundedCornerShape(4.dp),
-                    modifier = Modifier.alpha(alpha = if (currentPlate == "local") 1f else 0.6f)
-                ) {
-                    Text(
-                        "本地",
-                        fontSize = 16.sp,
-                        color = if (currentPlate == "local") Color.White else Color.White,
-                        fontWeight = if (currentPlate == "local") FontWeight.Bold else FontWeight.Normal
+                    label = {
+                        Text(
+                            "本地",
+                            fontSize = 14.sp,
+                            fontWeight = if (currentPlate == "local") FontWeight.SemiBold else FontWeight.Normal
+                        )
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                }
+                )
                 Spacer(Modifier.width(8.dp))
 
-                // 可搜索下拉选择框
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = {
@@ -158,14 +169,12 @@ fun TopStickyHeader(
                         value = searchQuery,
                         onValueChange = { query ->
                             searchQuery = query
-                            // 调用接口更新园区列表
-                            // Example: viewModel.fetchCampusList(query)
                         },
                         modifier = Modifier
                             .height(40.dp)
                             .fillMaxWidth()
                             .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
-                            .focusRequester(focusRequester) // 绑定 FocusRequester
+                            .focusRequester(focusRequester)
                             .onFocusChanged { focusState ->
                                 if (!focusState.isFocused) expanded = false
                             },
@@ -174,7 +183,7 @@ fun TopStickyHeader(
                         OutlinedTextFieldDefaults.DecorationBox(
                             value = searchQuery,
                             placeholder = {
-                                Text("选择园区", fontSize = 16.sp)
+                                Text("选择园区", fontSize = 14.sp)
                             },
                             innerTextField = innerTextField,
                             enabled = true,
@@ -182,12 +191,12 @@ fun TopStickyHeader(
                             visualTransformation = VisualTransformation.None,
                             interactionSource = remember { MutableInteractionSource() },
                             suffix = {
-                                Icon(Icons.Filled.KeyboardArrowDown, "选择园区", tint = Color.DarkGray)
+                                Icon(Icons.Filled.KeyboardArrowDown, "选择园区", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                             },
                             contentPadding = PaddingValues(
                                 top = 0.dp,
                                 bottom = 0.dp,
-                                start = 8.dp,
+                                start = 12.dp,
                                 end = 8.dp
                             )
                         )
@@ -215,7 +224,8 @@ fun TopStickyHeader(
         HorizontalDivider(
             Modifier
                 .fillMaxWidth()
-                .align(Alignment.BottomCenter)
+                .align(Alignment.BottomCenter),
+            color = MaterialTheme.colorScheme.outlineVariant
         )
     }
 }

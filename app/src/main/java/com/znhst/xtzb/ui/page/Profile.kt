@@ -1,6 +1,6 @@
 package com.znhst.xtzb.ui.page
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +37,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.znhst.xtzb.BuildConfig
-import com.znhst.xtzb.compose.ZoomableBox
+import com.znhst.xtzb.ui.theme.GradientEnd
+import com.znhst.xtzb.ui.theme.GradientStart
 import com.znhst.xtzb.viewModel.AuthViewModel
 import com.znhst.xtzb.viewModel.ProfileViewModel
 
@@ -40,71 +48,111 @@ fun Profile(
     outNavController: NavController,
     profileViewModel: ProfileViewModel = viewModel()
 ) {
-//    val navController = rememberNavController()
-
     LaunchedEffect(Unit) {
         profileViewModel.fetchUserInfo()
     }
 
     Column(
         modifier = Modifier
-            .padding(16.dp)
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
     ) {
-        UserInfo(profileViewModel)
+        ProfileHeader(profileViewModel)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        UserInfoCard(profileViewModel)
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Button(onClick = {
-                logout(viewModel, outNavController)
-            }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text("退出登录")
-            }
+        Button(
+            onClick = { logout(viewModel, outNavController) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFFF04438).copy(alpha = 0.1f),
+                contentColor = Color(0xFFF04438)
+            )
+        ) {
+            Text(
+                "退出登录",
+                fontWeight = FontWeight.Medium,
+                fontSize = 16.sp
+            )
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
 @Composable
-fun UserInfo(viewModel: ProfileViewModel) {
+fun ProfileHeader(viewModel: ProfileViewModel) {
     val userInfo = viewModel.userInfo.value
     val avatarUrl = remember(userInfo.avatarName) {
         "${BuildConfig.BASE_URL}/avatar/${userInfo.avatarName}"
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(160.dp)
+            .background(
+                Brush.horizontalGradient(
+                    listOf(GradientStart, GradientEnd)
+                )
+            ),
+        contentAlignment = Alignment.Center
     ) {
-
-        Spacer(Modifier.height(16.dp))
-
-        // 头像显示 - 方形圆角
-        AsyncImage(
-            model = avatarUrl,
-            contentDescription = "头像",
-            modifier = Modifier
-                .size(120.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .border(2.dp, Color.Gray, RoundedCornerShape(16.dp))
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            // 用户信息
-            Column(
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            AsyncImage(
+                model = avatarUrl,
+                contentDescription = "头像",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-            ) {
-                UserInfoRow(label = "登录账号", value = userInfo.userName, showDivider = true)
-                UserInfoRow(label = "用户昵称", value = userInfo.nickName, showDivider = true)
-                UserInfoRow(label = "所属园区", value = userInfo.dept.name, showDivider = true)
-                UserInfoRow(label = "手机号码", value = userInfo.phone, showDivider = false)
-            }
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .background(Color.White.copy(alpha = 0.2f))
+            )
+            Spacer(Modifier.height(12.dp))
+            Text(
+                text = userInfo.nickName.ifEmpty { userInfo.userName },
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.White
+            )
         }
+    }
+}
 
+@Composable
+fun UserInfoCard(viewModel: ProfileViewModel) {
+    val userInfo = viewModel.userInfo.value
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Text(
+                text = "个人信息",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(Modifier.height(16.dp))
+
+            UserInfoRow(label = "登录账号", value = userInfo.userName, showDivider = true)
+            UserInfoRow(label = "用户昵称", value = userInfo.nickName, showDivider = true)
+            UserInfoRow(label = "所属园区", value = userInfo.dept.name, showDivider = true)
+            UserInfoRow(label = "手机号码", value = userInfo.phone, showDivider = false)
+        }
     }
 }
 
@@ -113,28 +161,26 @@ fun UserInfoRow(label: String, value: String, showDivider: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceAround,
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(Modifier.height(4.dp))
         Text(
             text = label,
-            modifier = Modifier.weight(0.4f),
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = value,
-            modifier = Modifier.weight(0.6f),
-            color = Color.DarkGray,
-            fontSize = 16.sp,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.End
         )
     }
-    Spacer(Modifier.height(4.dp))
     if (showDivider) HorizontalDivider(
-        color = Color.LightGray.copy(alpha = 0.5f), // 设置所需颜色
-        thickness = 1.dp
+        color = MaterialTheme.colorScheme.outlineVariant,
+        thickness = 0.5.dp
     )
 }
 
@@ -164,7 +210,7 @@ fun logout(viewModel: AuthViewModel, navController: NavController) {
         val currentDestination = navController.currentDestination
         if(currentDestination?.route != "login") {
             navController.navigate("login") {
-                popUpTo("main") { inclusive = true } // 清空返回栈
+                popUpTo("main") { inclusive = true }
             }
         }
     }

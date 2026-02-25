@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,10 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +29,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -37,6 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.znhst.xtzb.R
 import com.znhst.xtzb.network.SmokeAlarmEntry
+import com.znhst.xtzb.ui.theme.Error10
+import com.znhst.xtzb.ui.theme.Error50
+import com.znhst.xtzb.ui.theme.Success10
+import com.znhst.xtzb.ui.theme.Success50
 import com.znhst.xtzb.viewModel.SmokeAlarmViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -57,9 +61,7 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
         historyList
     }
 
-    // 获取最新状态
     val latestStatus = displayList.firstOrNull()?.doorStatus
-    // 当无数据时，默认显示为正常状态
     val isNormal = latestStatus?.let { it == "正常" } ?: true
 
     LaunchedEffect(Unit) {
@@ -68,50 +70,55 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
+    ) {
         Box(modifier = Modifier.fillMaxWidth()) {
-            // 当前状态栏
             Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isNormal) Color(0xFFE8F5E9) else Color(
-                        0xFFFFEBEE
-                    )
+                    containerColor = if (isNormal) Success10 else Error10
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Image(
-                        painter = painterResource(id = if (isNormal) normalImgId else alarmImgId),
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        colorFilter = ColorFilter.tint(
-                            if (isNormal) Color(0xFF4CAF50) else Color(
-                                0xFFF44336
-                            )
+                    Box(
+                        modifier = Modifier
+                            .size(52.dp)
+                            .background(
+                                if (isNormal) Success50.copy(alpha = 0.15f) else Error50.copy(alpha = 0.15f),
+                                RoundedCornerShape(14.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = if (isNormal) normalImgId else alarmImgId),
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp),
+                            colorFilter = ColorFilter.tint(if (isNormal) Success50 else Error50)
                         )
-                    )
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
-                            text = "当前状态",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isNormal) Color(0xFF388E3C) else Color(0xFFD32F2F)
+                            text = if (isNormal) "设备正常" else "警报触发",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = if (isNormal) Success50 else Error50
                         )
+                        Spacer(Modifier.height(2.dp))
                         Text(
-                            text = when {
-                                latestStatus == null -> "设备正常运行"
-                                isNormal -> "设备正常运行"
-                                else -> "警报触发"
-                            },
-                            fontSize = 16.sp,
-                            color = Color.Gray
+                            text = if (isNormal) "设备正常运行中" else "请立即检查设备",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -121,91 +128,85 @@ fun SmokeAlarmDetail(deviceNo: String, viewModel: SmokeAlarmViewModel = viewMode
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(MaterialTheme.colorScheme.background),
+                        .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f)),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        if(!isLoading) {
-            Text(text = "历史记录", style = MaterialTheme.typography.bodyLarge)
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // if (historyList.isEmpty()) {
-            //     Box(
-            //         modifier = Modifier
-            //             .fillMaxWidth()
-            //             .padding(32.dp),
-            //         contentAlignment = Alignment.Center
-            //     ) {
-            //         Text(
-            //             text = "暂无数据",
-            //             style = MaterialTheme.typography.bodyLarge,
-            //             color = Color.Gray
-            //         )
-            //     }
-            // }
-        }
-        
-        if (!isLoading) {
-            LazyColumn(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                itemsIndexed(displayList) { index, item ->
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-
-                    ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(id = if (item.doorStatus == "正常") normalImgId else alarmImgId),
-                            contentDescription = null,
-                            modifier = Modifier.size(40.dp),
-                            colorFilter = ColorFilter.tint(Color.DarkGray)
-                        )
-                        Column(
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .weight(1f)
-                        ) {
-                            Text(
-                                text = "触发时间: ${item.time}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color.DarkGray
-                            )
-                            Text(
-                                text = "状态: ${item.doorStatus}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (item.doorStatus == "正常") Color(0xFF4CAF50) else Color(
-                                    0xFFF44336
-                                )
-                            )
-                        }
-                    }
-                }
-
-                if (index < displayList.size - 1) {
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 4.dp),
-                        thickness = 0.5.dp,
-                        color = Color.LightGray
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary,
+                        strokeWidth = 3.dp
                     )
                 }
             }
         }
-    }}
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (!isLoading) {
+            Text(
+                text = "历史记录",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+
+        if (!isLoading) {
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(displayList) { index, item ->
+                    val itemNormal = item.doorStatus == "正常"
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        elevation = CardDefaults.cardElevation(1.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(14.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .background(
+                                        if (itemNormal) Success50.copy(alpha = 0.08f) else Error50.copy(alpha = 0.08f),
+                                        RoundedCornerShape(10.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = if (itemNormal) normalImgId else alarmImgId),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(24.dp),
+                                    colorFilter = ColorFilter.tint(if (itemNormal) Success50 else Error50)
+                                )
+                            }
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.doorStatus,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (itemNormal) Success50 else Error50
+                                )
+                                Spacer(Modifier.height(2.dp))
+                                Text(
+                                    text = item.time,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

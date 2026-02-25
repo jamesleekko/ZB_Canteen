@@ -2,27 +2,37 @@ package com.znhst.xtzb.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFF2196F3)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Primary10 = Color(0xFFE8F1FF)
+val Primary20 = Color(0xFFCCDFFC)
+val Primary30 = Color(0xFF96BEF5)
+val Primary40 = Color(0xFF64A0EB)
+val Primary50 = Color(0xFF4B87EB)
+val Primary60 = Color(0xFF3A6FE7)
+val Primary70 = Color(0xFF2D5FD2)
+val Primary80 = Color(0xFF2350BE)
+val Primary90 = Color(0xFF1941AA)
+val Primary100 = Color(0xFF0F3296)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Neutral10 = Color(0xFFFAFBFD)
+val Neutral20 = Color(0xFFF2F4F7)
+val Neutral30 = Color(0xFFE4E7EC)
+val Neutral40 = Color(0xFFD0D5DD)
+val Neutral50 = Color(0xFF98A2B3)
+val Neutral60 = Color(0xFF667085)
+val Neutral70 = Color(0xFF475467)
+val Neutral80 = Color(0xFF344054)
+val Neutral90 = Color(0xFF1D2939)
+val Neutral100 = Color(0xFF101828)
 
-val PrimaryGrey80 = Color(0xFFC3D2DE)
-val PrimaryLighter80 = Color(0xFFE6F0F8)
+val Success50 = Color(0xFF12B76A)
+val Success10 = Color(0xFFECFDF3)
+val Warning50 = Color(0xFFF79009)
+val Warning10 = Color(0xFFFFFAEB)
+val Error50 = Color(0xFFF04438)
+val Error10 = Color(0xFFFEF3F2)
 
-val Primary10 = Color(red = 230, green = 240, blue = 255)  // 非常浅，适合背景
-val Primary20 = Color(red = 200, green = 220, blue = 250)  // 浅色
-val Primary30 = Color(red = 150, green = 190, blue = 245)  // 次浅色
-val Primary40 = Color(red = 100, green = 160, blue = 240)  // 正常亮度偏浅
-val Primary50 = Color(red = 75, green = 135, blue = 235)   // 中间色
-val Primary60 = Color(red = 58, green = 111, blue = 231)   // 中心颜色
-val Primary70 = Color(red = 45, green = 95, blue = 210)    // 深色
-val Primary80 = Color(red = 35, green = 80, blue = 190)    // 更深
-val Primary90 = Color(red = 25, green = 65, blue = 170)    // 非常深色
-val Primary100 = Color(red = 15, green = 50, blue = 150)   // 最深色，适合强调
+val GradientStart = Color(0xFF4B7BF5)
+val GradientEnd = Color(0xFF6C5CE7)
+val GradientWarm = Color(0xFFFF6B6B)
 
-val PrimaryGrey40 = Color(0xFF78909C)
-val PrimaryLighter40 = Color(0xFFB5CFEF)
+val CardBg = Color(0xFFFFFFFE)
