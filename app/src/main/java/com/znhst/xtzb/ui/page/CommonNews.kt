@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -34,11 +35,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -50,13 +53,13 @@ import com.znhst.xtzb.viewModel.NewsViewModel
 import kotlinx.coroutines.launch
 
 val colors = listOf(
-    Color(0xFF5F8C6B), // Announcement
-    Color(0xFF6168A7), // News
-    Color(0xFF7363A7), // Spotlight
-    Color(0xFFA05A89), // Training
-    Color(0xFFC2694E), // Files
-    Color(0xFFB68A4D), // Topic
-    Color(0xFF6C9975)  // Nutrition
+    Color(0xFF5F8C6B),
+    Color(0xFF6168A7),
+    Color(0xFF7363A7),
+    Color(0xFFA05A89),
+    Color(0xFFC2694E),
+    Color(0xFFB68A4D),
+    Color(0xFF6C9975)
 )
 
 @Composable
@@ -80,7 +83,6 @@ fun CommonNews(
     }
     LaunchedEffect(categories) {
         if (categories.isNotEmpty()) {
-            // 清空当前新闻列表
             newsViewModel.clearNewsList()
             val selectedCategoryType = categories[selectedTabIndex].type
             newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
@@ -100,18 +102,20 @@ fun CommonNews(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // 顶部的滚动 Tab 切换栏
         if (categories.isNotEmpty()) {
             ScrollableTabRow(
                 selectedTabIndex = selectedTabIndex,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 0.dp)
-                    .background(MaterialTheme.colorScheme.surface),
-                edgePadding = 0.dp,
+                    .padding(horizontal = 0.dp),
+                edgePadding = 8.dp,
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                divider = {}
             ) {
                 categories.forEachIndexed { index, item ->
                     val coroutineScope = rememberCoroutineScope()
+                    val tabColor = colors[index % colors.size]
 
                     Tab(
                         selected = selectedTabIndex == index,
@@ -120,7 +124,6 @@ fun CommonNews(
                                 selectedTabIndex = index
                                 currentPage = 0
 
-                                // 先滚动到顶部
                                 coroutineScope.launch {
                                     listState.scrollToItem(0)
                                 }
@@ -133,17 +136,17 @@ fun CommonNews(
                             }
                         },
                         modifier = Modifier
-                            .padding(4.dp) // 添加一点内边距
-                            .clip(RoundedCornerShape(5.dp)) // 圆角背景
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(20.dp))
                             .background(
-                                if (selectedTabIndex == index) colors[index] else Color.Transparent
-                            ), // 选中时背景为对应颜色
+                                if (selectedTabIndex == index) tabColor else Color.Transparent
+                            ),
                         text = {
                             Text(
                                 item.displayName,
-                                color = if (selectedTabIndex == index) Color.White else Color.Gray,
-                                fontWeight = if(selectedTabIndex == index) FontWeight.Bold else FontWeight.Normal,
-                                fontSize = 16.sp
+                                color = if (selectedTabIndex == index) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = if(selectedTabIndex == index) FontWeight.SemiBold else FontWeight.Normal,
+                                fontSize = 14.sp
                             )
                         }
                     )
@@ -162,14 +165,14 @@ fun CommonNews(
             state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 12.dp)
         ) {
             items(currentNewsList) { newsItem ->
                 NewsItemRow(newsItem, outNavController)
-                Spacer(modifier = Modifier.height(6.dp))
             }
 
-            // 加载更多提示
             if (currentNewsList.size < currentTotal) {
                 item {
                     Row(
@@ -178,7 +181,11 @@ fun CommonNews(
                             .padding(16.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.primary,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                 }
             }
@@ -197,47 +204,56 @@ fun NewsItemRow(newsItem: NewsItem, outNavController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
             .clickable { onClickArticle() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                ArticlePreview(item = newsItem)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ArticlePreview(item = newsItem)
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = newsItem.title,
-                    fontSize = 18.sp,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                val typeName = when (newsItem.kindName) {
-                    "video" -> "视频"
-                    "pdf" -> "PDF文档"
-                    "word" -> "Word文档"
-                    else -> "未知类型"
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    val typeName = when (newsItem.kindName) {
+                        "video" -> "视频"
+                        "pdf" -> "PDF文档"
+                        "word" -> "Word文档"
+                        else -> "未知类型"
+                    }
+
+                    Text(
+                        text = typeName,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+
+                    Text(
+                        text = newsItem.updateTime,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
-
-                Text(
-                    text = "类别: $typeName",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
-
-                Text(
-                    text = newsItem.updateTime,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline
-                )
             }
         }
     }
@@ -255,13 +271,13 @@ fun ArticlePreview(item: NewsItem) {
     Box(
         modifier = Modifier
             .size(48.dp)
-            .background(Color(0xFFF5F5F5), shape = RoundedCornerShape(8.dp))
-            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(12.dp))
+            .padding(10.dp)
     ) {
         Image(
             painter = icon,
             contentDescription = null,
-            modifier = Modifier.size(48.dp) // 图标大小
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

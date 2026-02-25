@@ -3,38 +3,41 @@ package com.znhst.xtzb.ui.page
 import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat.startActivity
 import com.znhst.xtzb.R
+import com.znhst.xtzb.ui.theme.GradientEnd
+import com.znhst.xtzb.ui.theme.GradientStart
 import com.znhst.xtzb.viewModel.AuthViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -94,40 +97,53 @@ fun MainPage(
                             mainPageNavController.popBackStack()
                         }) {
                             Icon(
-                                imageVector = Icons.Default.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "返回",
-                                tint = Color.Black
+                                tint = Color.White
                             )
                         }
                     }
                 }
             }
             TopAppBar(
-                title = { Text(text = "智能化食堂") },
+                title = {
+                    Text(
+                        text = "智能化食堂",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp,
+                        color = Color.White
+                    )
+                },
                 navigationIcon = navigationIcon,
                 actions = {
                     IconButton(onClick = {
                         val intent = Intent(context, CodeScanActivity::class.java)
-                        startActivity(context, intent, null)
+                        context.startActivity(intent)
                     }) {
                         Icon(
                             painter = painterResource(id = R.drawable.scan),
                             contentDescription = "扫描库存二维码",
-                            tint = Color.Black
+                            tint = Color.White
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .shadow(
-                        elevation = if (outNavController.currentDestination?.route == "main") 0.dp else 2.dp,
-                        shape = RectangleShape,
-                        clip = true
+                    .background(
+                        Brush.horizontalGradient(
+                            listOf(GradientStart, GradientEnd)
+                        )
                     )
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 8.dp,
+            ) {
                 routes.forEachIndexed { index, screen ->
                     NavigationBarItem(
                         icon = {
@@ -136,19 +152,30 @@ fun MainPage(
                                 contentDescription = screen.route
                             )
                         },
-                        label = { Text(screen.title, fontSize = 14.sp) },
+                        label = {
+                            Text(
+                                screen.title,
+                                fontSize = 12.sp,
+                                fontWeight = if (selectedItem == index) FontWeight.SemiBold else FontWeight.Normal
+                            )
+                        },
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
                             mainPageNavController.navigate(screen.route)
-                        }
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                        )
                     )
                 }
             }
         },
     ) { innerPadding ->
-        println(innerPadding)
-
         Column(Modifier.padding(innerPadding)) {
             NavHost(
                 navController = mainPageNavController,
@@ -186,11 +213,11 @@ fun MainPage(
                 composable(
                     route = "temp_humi_list/{category}",
                     arguments = listOf(
-                        navArgument("category") { type = NavType.StringType } // 将枚举传递为字符串
+                        navArgument("category") { type = NavType.StringType }
                     )
                 ) { backStackEntry ->
                     val categoryString = backStackEntry.arguments?.getString("category")
-                    val category = TempHumiCategory.valueOf(categoryString!!) // 将字符串转回枚举
+                    val category = TempHumiCategory.valueOf(categoryString!!)
                     TempHumiList(navController = mainPageNavController, category = category)
                 }
                 composable(

@@ -3,6 +3,7 @@ package com.znhst.xtzb.ui.page
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,10 +33,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.znhst.xtzb.R
 import com.znhst.xtzb.network.FreezerEntry
+import com.znhst.xtzb.ui.theme.Error50
+import com.znhst.xtzb.ui.theme.Success50
 import com.znhst.xtzb.viewModel.FreezerDetailViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -53,95 +60,88 @@ fun FreezerDetail(deviceNo: String, viewModel: FreezerDetailViewModel = viewMode
         historyList
     }
 
-    // 数据加载
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             viewModel.fetchHistory(deviceNo)
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
         if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 3.dp
+                )
             }
-        }
-        // else if (historyList.isEmpty()) {
-        //     Box(
-        //         modifier = Modifier.fillMaxSize(),
-        //         contentAlignment = Alignment.Center
-        //     ) {
-        //         Text(
-        //             text = "暂无数据",
-        //             style = MaterialTheme.typography.bodyLarge,
-        //             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        //         )
-        //     }
-        // }
-        else {
+        } else {
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 itemsIndexed(displayList) { index, item ->
-            // 用 Card 包裹每条记录
-            androidx.compose.material3.Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                elevation = androidx.compose.material3.CardDefaults.cardElevation(4.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // 门状态图标
-                    Image(
-                        painter = painterResource(
-                            id = if (item.doorStatus == "开门") openDoorImgId else closeDoorImgId
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp), // 图标增大
-                        colorFilter = ColorFilter.tint(
-                            if (item.doorStatus == "开门") Color(0xFF4CAF50) // 绿色表示开门
-                            else Color(0xFFF44336) // 红色表示关门
+                    val isOpen = item.doorStatus == "开门"
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surface
                         )
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp)) // 图标与文本分隔
-
-                    Column(
-                        modifier = Modifier.weight(1f) // 分布式布局
                     ) {
-                        // 操作时间
-                        Text(
-                            text = "操作时间: ${item.time}",
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        // 动作描述
-                        Text(
-                            text = "动作: ${item.doorStatus}",
-                            style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.primary
-                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .background(
+                                        if (isOpen) Success50.copy(alpha = 0.1f) else Error50.copy(alpha = 0.1f),
+                                        RoundedCornerShape(12.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(
+                                        id = if (isOpen) openDoorImgId else closeDoorImgId
+                                    ),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(28.dp),
+                                    colorFilter = ColorFilter.tint(
+                                        if (isOpen) Success50 else Error50
+                                    )
+                                )
+                            }
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.doorStatus,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = if (isOpen) Success50 else Error50
+                                )
+                                Spacer(Modifier.height(4.dp))
+                                Text(
+                                    text = item.time,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
                 }
-            }
-
-            // 列表分隔线
-            if (index < displayList.size - 1) {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
             }
         }
     }
