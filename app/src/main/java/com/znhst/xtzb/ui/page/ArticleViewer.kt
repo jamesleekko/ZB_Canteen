@@ -2,6 +2,7 @@ package com.znhst.xtzb.ui.page
 
 import android.view.ViewGroup
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -11,11 +12,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
@@ -51,13 +62,14 @@ fun ArticleViewer(
     newsItem: NewsItem,
     outNavController: NavController
 ) {
+    val fileIdentifier = newsItem.filePath ?: newsItem.fileName ?: ""
     Column {
         when (newsItem.kindName) {
-            "pdf" -> PdfViewer(newsItem.fileName!!, onExit = {
+            "pdf" -> PdfViewer(fileIdentifier, onExit = {
                 outNavController.popBackStack()
             })
 
-            "video" -> VideoViewer(newsItem.fileName!!, onExit = {
+            "video" -> VideoViewer(fileIdentifier, onExit = {
                 outNavController.popBackStack()
             })
         }
@@ -65,7 +77,7 @@ fun ArticleViewer(
 }
 
 @Composable
-fun PdfViewer(fileName: String, onExit: () -> Unit) {
+fun PdfViewer(storedFileName: String, onExit: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -74,7 +86,8 @@ fun PdfViewer(fileName: String, onExit: () -> Unit) {
             .fillMaxSize()
             .background(Color.Gray)
     ) {
-        val pdfUrl = "${BuildConfig.BASE_URL}/article/${fileName}"
+        val encodedName = java.net.URLEncoder.encode(storedFileName, "UTF-8")
+        val pdfUrl = "${BuildConfig.BASE_URL}/api/file/download?dir=article&name=$encodedName"
 
         val verticalVueReaderState = rememberVerticalVueReaderState(
             resource = VueResourceType.Remote(
@@ -102,20 +115,9 @@ fun PdfViewer(fileName: String, onExit: () -> Unit) {
 
         when (verticalVueReaderState.vueLoadState) {
             is VueLoadState.NoDocument -> {
-                Button(onClick = {
-                    verticalVueReaderState.launchImportIntent(
-                        context = context,
-                        launcher = launcher
-                    )
-                }) {
-                    Text(text = "Import Document")
-                }
-            }
-
-            is VueLoadState.DocumentError -> {
-                Column {
-                    Text(text = "Error:  ${verticalVueReaderState.vueLoadState.getErrorMessage}")
-                    Button(onClick = {
+                DocumentErrorScreen(
+                    message = "未找到文档",
+                    onRetry = {
                         scope.launch {
                             verticalVueReaderState.load(
                                 context = context,
@@ -125,10 +127,28 @@ fun PdfViewer(fileName: String, onExit: () -> Unit) {
                                 customResource = null
                             )
                         }
-                    }) {
-                        Text(text = "Retry")
-                    }
-                }
+                    },
+                    onBack = onExit
+                )
+            }
+
+            is VueLoadState.DocumentError -> {
+                DocumentErrorScreen(
+                    message = verticalVueReaderState.vueLoadState.getErrorMessage
+                        ?: "文档加载失败",
+                    onRetry = {
+                        scope.launch {
+                            verticalVueReaderState.load(
+                                context = context,
+                                coroutineScope = scope,
+                                containerSize = containerSize,
+                                isPortrait = true,
+                                customResource = null
+                            )
+                        }
+                    },
+                    onBack = onExit
+                )
             }
 
             is VueLoadState.DocumentImporting -> {
@@ -179,8 +199,9 @@ fun PdfViewer(fileName: String, onExit: () -> Unit) {
 }
 
 @Composable
-fun VideoViewer(fileName: String, onExit: () -> Unit) {
-    val videoUrl = "${BuildConfig.BASE_URL}/article/${fileName}"
+fun VideoViewer(storedFileName: String, onExit: () -> Unit) {
+    val encodedName = java.net.URLEncoder.encode(storedFileName, "UTF-8")
+    val videoUrl = "${BuildConfig.BASE_URL}/api/file/download?dir=article&name=$encodedName"
 
     val context = LocalContext.current
     val exoPlayer = remember {
@@ -223,10 +244,93 @@ fun VideoViewer(fileName: String, onExit: () -> Unit) {
                 .padding(start = 16.dp, top = 32.dp)
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "退出",
                 tint = Color.White
             )
+        }
+    }
+}
+
+@Composable
+fun DocumentErrorScreen(
+    message: String,
+    onRetry: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = null,
+            modifier = Modifier.size(72.dp),
+            tint = Color.White.copy(alpha = 0.7f)
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Text(
+            text = "文档加载失败",
+            color = Color.White,
+            fontSize = 20.sp,
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = message,
+            color = Color.White.copy(alpha = 0.6f),
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth(0.8f)
+        )
+
+        Spacer(Modifier.height(32.dp))
+
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(46.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(text = "重试", fontSize = 16.sp)
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        OutlinedButton(
+            onClick = onBack,
+            modifier = Modifier
+                .fillMaxWidth(0.6f)
+                .height(46.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Color.White
+            )
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                modifier = Modifier.size(18.dp)
+            )
+            Spacer(Modifier.width(6.dp))
+            Text(text = "返回", fontSize = 16.sp)
         }
     }
 }

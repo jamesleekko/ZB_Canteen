@@ -51,12 +51,10 @@ class NewsViewModel(application: Application): AndroidViewModel(application) {
                 val request = NewsListRequest(type = type, page = page, pageSize = pageSize)
                 val result = ApiClient.apiService.getNewsList(request)
 
-                // 如果类型发生变化，则重置列表
-                if (type != lastFetchedType) {
+                if (type != lastFetchedType || page == 0) {
                     _currentNewsList.value = result.list
-                    lastFetchedType = type // 更新上次请求的类型
+                    lastFetchedType = type
                 } else {
-                    // 增量加载新闻列表
                     _currentNewsList.value += result.list
                 }
 

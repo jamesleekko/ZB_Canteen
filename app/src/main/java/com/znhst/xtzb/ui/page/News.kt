@@ -54,12 +54,24 @@ fun News(outNavController: NavController) {
 
     fun onClickCommon() {
         currentPlate = "common"
-        navController.navigate("common_news")
+        navController.navigate("common_news") {
+            popUpTo(navController.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 
     fun onClickLocal() {
         currentPlate = "local"
-        navController.navigate("local_news")
+        navController.navigate("local_news") {
+            popUpTo(navController.graph.startDestinationId) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

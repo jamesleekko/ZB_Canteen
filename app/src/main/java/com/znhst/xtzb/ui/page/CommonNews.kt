@@ -1,6 +1,7 @@
 package com.znhst.xtzb.ui.page
 
 import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,10 +68,12 @@ val colors = listOf(
 
 @Composable
 fun CommonNews(
-    newsViewModel: NewsViewModel = viewModel(),
     navController: NavController,
     outNavController: NavController
 ) {
+    val activity = LocalContext.current as ComponentActivity
+    val newsViewModel: NewsViewModel = viewModel(activity)
+
     val categories by newsViewModel.categoryList.collectAsState()
 
     var currentPage by rememberSaveable { mutableStateOf(0) }
@@ -81,15 +85,16 @@ fun CommonNews(
     var selectedTabIndex by rememberSaveable { mutableStateOf(0) }
 
     LaunchedEffect(Unit) {
-        newsViewModel.fetchCategories()
+        if (categories.isEmpty()) {
+            newsViewModel.fetchCategories()
+        }
     }
     LaunchedEffect(categories) {
-        if (categories.isNotEmpty()) {
-            if (currentNewsList.isEmpty()) {
-                newsViewModel.clearNewsList()
-                val selectedCategoryType = categories[selectedTabIndex].type
-                newsViewModel.fetchNews(selectedCategoryType, currentPage, pageSize)
-            }
+        if (categories.isNotEmpty() && currentNewsList.isEmpty()) {
+            currentPage = 0
+            newsViewModel.clearNewsList()
+            val selectedCategoryType = categories[selectedTabIndex].type
+            newsViewModel.fetchNews(selectedCategoryType, 0, pageSize)
         }
     }
 

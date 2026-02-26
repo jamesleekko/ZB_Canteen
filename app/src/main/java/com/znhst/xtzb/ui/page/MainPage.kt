@@ -162,7 +162,13 @@ fun MainPage(
                         selected = selectedItem == index,
                         onClick = {
                             selectedItem = index
-                            mainPageNavController.navigate(screen.route)
+                            mainPageNavController.navigate(screen.route) {
+                                popUpTo(mainPageNavController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.primary,
